@@ -1,0 +1,29 @@
+name: Check PR
+
+on:
+  pull_request:
+    branches: [ $default-branch ]
+
+env:
+  SSH_KEY: ${{ secrets.SSH_KEY }}
+  SSH_HOST: ${{ secrets.SSH_HOST }}
+  SSH_USER: ${{ secrets.SSH_USER }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+        with:
+          ref: $default-branch
+          path: main
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          path: pr
+      - name: Prepare to run Ansible
+        run: . main/ci/scripts/common-setup.sh
+      - name: Check Ansible playbook
+        run: . main/ci/scripts/ansible-check.sh
