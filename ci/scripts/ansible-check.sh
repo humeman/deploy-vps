@@ -1,3 +1,8 @@
 #!/bin/bash
 
-ansible-playbook -i hosts -u ${SSH_USER} pr/ansible/main.yml
+set -e
+
+. main/ci/scripts/env-setup.sh $1
+
+echo "-- Checking playbook on environment $1 --"
+ansible-playbook -i "${!SSH_HOST}" -u "${!SSH_USER}" --private-key id_rsa --become-password-file sudo --check --diff pr/ansible/main.yml

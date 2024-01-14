@@ -1,0 +1,24 @@
+name: Apply Latest to Prod
+
+on:
+  workflow_dispatch: {}
+
+env:
+  SSH_KEY: ${{ secrets.SSH_KEY }}
+  SSH_HOST: ${{ secrets.SSH_HOST }}
+  SSH_USER: ${{ secrets.SSH_USER }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+        with:
+          ref: $default-branch
+          path: main
+      - name: Prepare to run Ansible
+        run: . main/ci/scripts/common-setup.sh
+      - name: Execute Ansible playbook (PROD)
+        run: . main/ci/scripts/ansible-execute.sh PROD
