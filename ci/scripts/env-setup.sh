@@ -8,7 +8,7 @@ export SSH_KEY="SSH_KEY_$1"
 export SSH_HOST="SSH_HOST_$1"
 export SSH_SUDO="SSH_SUDO_$1"
 export ANSIBLE_VAULT="ANSIBLE_VAULT_$1"
-export ANSIBLE_VAULT_K_="ANSIBLE_VAULT_K_$1"
+export ANSIBLE_VAULT_K="ANSIBLE_VAULT_K_$1"
 
 echo "-- Writing keys --"
 echo "${!SSH_KEY}" > id_rsa
