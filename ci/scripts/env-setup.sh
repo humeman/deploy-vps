@@ -12,6 +12,7 @@ export ANSIBLE_VAULT_K="ANSIBLE_VAULT_K_$1"
 
 echo "-- Writing keys --"
 echo "${!SSH_KEY}" > id_rsa
+chmod 0600 id_rsa
 echo "${!SSH_SUDO}" > sudo
 echo "${!ANSIBLE_VAULT}" > vault
 echo "${!ANSIBLE_VAULT_K}" > vault_k
