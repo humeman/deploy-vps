@@ -1,0 +1,10 @@
+- name: Add Duplicity PPA
+  ansible.builtin.apt_repository:
+    repo: ppa:duplicity-team/ppa
+    state: present
+
+- name: Install Duplicity
+  ansible.builtin.apt:
+    update_cache: yes
+    pkg:
+    - duplicity>=0.8.08

@@ -1,0 +1,5 @@
+- name: Add scripts folder
+  ansible.builtin.file:
+    path: /scripts
+    state: directory
+    mode: '0755'

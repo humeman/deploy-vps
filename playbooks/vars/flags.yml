@@ -1,0 +1,9 @@
+flags:
+  dev:
+    setup: true
+    alerting: true
+    backblaze: true
+  prod:
+    setup: true
+    alerting: true
+    backblaze: true

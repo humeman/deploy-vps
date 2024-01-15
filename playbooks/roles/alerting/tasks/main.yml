@@ -1,0 +1,5 @@
+- name: Verify dependencies and execute
+  block:
+    - name: Create systemd notifier
+      import_tasks: notifier.yml
+  when: flags['{{ env }}']['setup'] and flags['{{ env }}']['alerting']

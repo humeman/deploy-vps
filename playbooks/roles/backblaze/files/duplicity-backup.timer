@@ -1,0 +1,11 @@
+[Unit]
+Description=Timer to run duplicity-backup.service
+
+[Timer]
+Unit=duplicity-backup.service
+OnCalendar=*-*-* 00:00:00
+Persistent=True
+RandomizedDelaySec=600
+
+[Install]
+WantedBy=timers.target

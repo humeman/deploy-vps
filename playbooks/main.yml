@@ -1,0 +1,17 @@
+- hosts: all
+  remote_user: root
+  vars_files:
+    - vars/flags.yml
+  roles:
+    - name: Primary node setup
+      include_role:
+        name: setup
+      when: flags['{{ env }}']['setup']
+    - name: Alerting
+      include_role:
+        name: alerting
+      when: flags['{{ env }}']['alerting']
+    - name: Backblaze B2 backups
+      include_role:
+        name: backblaze
+      when: flags['{{ env }}']['backblaze']

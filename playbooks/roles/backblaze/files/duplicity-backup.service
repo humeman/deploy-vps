@@ -1,0 +1,11 @@
+[Unit]
+Description=Back up directories to Backblaze B2 on a schedule
+After=syslog.target network.target remote-fs.target nss-lookup.target
+OnFailure=notifier@%i.service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash /scripts/backblaze/b2-backup-all.sh
+
+[Install]
+WantedBy=multi-user.target
