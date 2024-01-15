@@ -2,7 +2,8 @@ name: Apply Push to Dev
 
 on:
   push:
-    branches: [ $default-branch ]
+    branches:
+      - main
 
 env:
   SSH_KEY_DEV: ${{ secrets.SSH_KEY_DEV }}
@@ -21,7 +22,7 @@ jobs:
       - name: Checkout main branch
         uses: actions/checkout@v4
         with:
-          ref: $default-branch
+          ref: main
           path: main
       - name: Prepare to run Ansible
         run: . main/ci/scripts/common-setup.sh
