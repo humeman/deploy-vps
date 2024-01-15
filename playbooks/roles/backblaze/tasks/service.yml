@@ -20,7 +20,10 @@
     dest: /etc/systemd/system/duplicity-backup.service
     owner: root
     group: root
-    validate: systemd-analyze verify %s
+  become: true
+
+- name: Validate notifier systemd service
+  ansible.builtin.command: systemd-analyze verify /etc/systemd/system/duplicity-backup.service
   become: true
 
 - name: Create duplicity-backup systemd timer
@@ -29,7 +32,10 @@
     dest: /etc/systemd/system/duplicity-backup.timer
     owner: root
     group: root
-    validate: systemd-analyze verify %s
+  become: true
+
+- name: Validate notifier systemd service
+  ansible.builtin.command: systemd-analyze verify /etc/systemd/system/duplicity-backup.timer
   become: true
 
 - name: Enable duplicity-backup systemd timer

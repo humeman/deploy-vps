@@ -20,5 +20,8 @@
     dest: /etc/systemd/system/notifier@.service
     owner: root
     group: root
-    validate: systemd-analyze verify %s
+  become: true
+
+- name: Validate notifier systemd service
+  ansible.builtin.command: systemd-analyze verify /etc/systemd/system/notifier@.service
   become: true
