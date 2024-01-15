@@ -3,3 +3,4 @@
     path: /scripts
     state: directory
     mode: '0755'
+  become: true
