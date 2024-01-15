@@ -6,12 +6,13 @@
     - name: Primary node setup
       include_role:
         name: setup
-      when: flags['{{ env }}']['setup']
+      when: flags[env]['setup']
+      become: true
     - name: Alerting
       include_role:
         name: alerting
-      when: flags['{{ env }}']['alerting']
+      when: flags[env]['alerting']
     - name: Backblaze B2 backups
       include_role:
         name: backblaze
-      when: flags['{{ env }}']['backblaze']
+      when: flags[env]['backblaze']
