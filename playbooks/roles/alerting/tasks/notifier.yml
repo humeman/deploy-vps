@@ -2,7 +2,7 @@
   ansible.builtin.file:
     path: /scripts/notifier
     state: directory
-    node: '0755'
+    mode: '0755'
   become: true
     
 - name: Add templated script notify.sh
