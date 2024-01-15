@@ -11,5 +11,6 @@ ansible-playbook \
     -e @vault \
     --vault-password-file vault_k \
     --private-key id_rsa \
+    --become-user root \
     --become-password-file sudo \
     main/playbooks/main.yml

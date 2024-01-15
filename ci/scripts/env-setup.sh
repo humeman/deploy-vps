@@ -19,7 +19,7 @@ echo "${!ANSIBLE_VAULT_K}" > vault_k
 echo "-- Creating inventory --"
 cat << EOF > inventory
 [servers]
-${!SSH_HOST} ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+${!SSH_HOST} ansible_user=${!SSH_USER} ansible_ssh_common_args='-o StrictHostKeyChecking=no'
 EOF
 
 echo "-- Ready to go! --"
