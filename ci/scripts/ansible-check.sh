@@ -6,7 +6,7 @@ set -e
 
 echo "-- Checking playbook on environment $1 --"
 ansible-playbook \
-    -i "${!SSH_HOST}" \
+    -i inventory \
     -u "${!SSH_USER}" \
     -e @vault \
     --vault-password-file vault_k \

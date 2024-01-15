@@ -16,4 +16,10 @@ echo "${!SSH_SUDO}" > sudo
 echo "${!ANSIBLE_VAULT}" > vault
 echo "${!ANSIBLE_VAULT_K}" > vault_k
 
+echo "-- Creating inventory --"
+cat << EOF > inventory
+[servers]
+${!SSH_HOST}
+EOF
+
 echo "-- Ready to go! --"
