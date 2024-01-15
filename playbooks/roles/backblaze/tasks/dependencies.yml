@@ -2,9 +2,11 @@
   ansible.builtin.apt_repository:
     repo: ppa:duplicity-team/ppa
     state: present
+  become: true
 
 - name: Install Duplicity
   ansible.builtin.apt:
     update_cache: yes
     pkg:
     - duplicity>=0.8.08
+  become: true

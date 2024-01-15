@@ -2,5 +2,4 @@
   block:
     - name: Create systemd notifier
       import_tasks: notifier.yml
-  when: flags['{{ env }}']['setup'] and flags['{{ env }}']['alerting']
-  become: true
+  when: flags[env]['setup'] and flags[env]['alerting']

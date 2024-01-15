@@ -3,6 +3,7 @@
     path: /scripts/notifier
     state: directory
     node: '0755'
+  become: true
     
 - name: Add templated script notify.sh
   ansible.builtin.template:
@@ -11,7 +12,8 @@
     owner: root
     group: root
     mode: '0700'
-    
+  become: true
+
 - name: Create notifier systemd service
   ansible.builtin.template:
     src: ../files/notifier@.service
@@ -19,3 +21,4 @@
     owner: root
     group: root
     validate: systemd-analyze verify %s
+  become: true
