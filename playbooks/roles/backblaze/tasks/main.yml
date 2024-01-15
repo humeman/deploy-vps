@@ -1,0 +1,5 @@
+- name: Install Duplicity
+  import_tasks: dependencies.yml
+  
+- name: Create Duplicity systemd backup timer
+  import_tasks: service.yml

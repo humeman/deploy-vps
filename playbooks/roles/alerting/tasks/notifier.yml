@@ -1,0 +1,21 @@
+- name: Add scripts/notifier folder
+  ansible.builtin.file:
+    path: /scripts/notifier
+    state: directory
+    node: '0755'
+    
+- name: Add templated script notify.sh
+  ansible.builtin.template:
+    src: ../files/notify.sh
+    dest: /scripts/notifier/notify.sh
+    owner: root
+    group: root
+    mode: '0700'
+    
+- name: Create notifier systemd service
+  ansible.builtin.template:
+    src: ../files/notifier@.service
+    dest: /etc/systemd/system/notifier@.service
+    owner: root
+    group: root
+    validate: systemd-analyze verify %s

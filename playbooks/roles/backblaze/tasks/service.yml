@@ -1,0 +1,38 @@
+- name: Add scripts/backblaze folder
+  ansible.builtin.file:
+    path: /scripts/backblaze
+    state: directory
+    node: '0755'
+
+- name: Add templated script b2-backup.sh
+  ansible.builtin.template:
+    src: ../files/b2-backup.sh
+    dest: /scripts/backblaze/b2-backup.sh
+    owner: root
+    group: root
+    mode: '0700'
+
+- name: Create duplicity-backup systemd service
+  ansible.builtin.template:
+    src: ../files/duplicity-backup.service
+    dest: /etc/systemd/system/duplicity-backup.service
+    owner: root
+    group: root
+    validate: systemd-analyze verify %s
+
+- name: Create duplicity-backup systemd timer
+  ansible.builtin.template:
+    src: ../files/duplicity-backup.timer
+    dest: /etc/systemd/system/duplicity-backup.timer
+    owner: root
+    group: root
+    validate: systemd-analyze verify %s
+    
+- name: Enable duplicity-backup systemd timer
+  ansible.builtin.systemd_service:
+    name: duplicity-backup.timer
+    state: started
+    scope: system
+    no_block: true
+    enabled: true
+    daemon_reload: true

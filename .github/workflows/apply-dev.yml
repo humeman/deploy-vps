@@ -5,9 +5,13 @@ on:
     branches: [ $default-branch ]
 
 env:
-  SSH_KEY: ${{ secrets.SSH_KEY }}
-  SSH_HOST: ${{ secrets.SSH_HOST }}
-  SSH_USER: ${{ secrets.SSH_USER }}
+  SSH_KEY_DEV: ${{ secrets.SSH_KEY_DEV }}
+  SSH_HOST_DEV: ${{ secrets.SSH_HOST_DEV }}
+  SSH_USER_DEV: ${{ secrets.SSH_USER_DEV }}
+
+  SSH_KEY_PROD: ${{ secrets.SSH_KEY_PROD }}
+  SSH_HOST_PROD: ${{ secrets.SSH_HOST_PROD }}
+  SSH_USER_PROD: ${{ secrets.SSH_USER_PROD }}
 
 jobs:
   build:

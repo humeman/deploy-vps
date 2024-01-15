@@ -1,0 +1,9 @@
+[Unit]
+Description=Sends service alerts to a Discord webhook
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash /scripts/notifier/notify.sh %i
+
+[Install]
+WantedBy=multi-user.target
