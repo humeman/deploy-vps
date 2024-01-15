@@ -25,6 +25,6 @@ jobs:
           ref: main
           path: main
       - name: Prepare to run Ansible
-        run: . main/ci/scripts/common-setup.sh
+        run: . main/ci/scripts/prep.sh
       - name: Execute Ansible playbook (DEV)
         run: . main/ci/scripts/ansible-execute.sh DEV
