@@ -16,6 +16,7 @@ env:
 
 jobs:
   build:
+    name: Check Ansible changes
     runs-on: ubuntu-latest
 
     steps:
