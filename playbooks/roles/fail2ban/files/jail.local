@@ -1,0 +1,37 @@
+[INCLUDES]
+before = paths-debian.conf
+
+[DEFAULT]
+bantime.increment = true
+bantime.multipliers = 1 5 30 60 300 720 1440 2880
+ignoreip = 127.0.0.1/8 ::1
+bantime  = 10m
+findtime  = 10m
+maxretry = 5
+maxmatches = %(maxretry)s
+backend = auto
+usedns = warn
+logencoding = auto
+enabled = false
+mode = normal
+filter = %(__name__)s[mode=%(mode)s]
+protocol = tcp
+port = 0:65535
+fail2ban_agent = Fail2Ban/%(fail2ban_version)s
+banaction = iptables-multiport
+banaction_allports = iptables-allports
+action = %(action_)s
+action_ = %(banaction)s[name=%(__name__)s, port="%(port)s", protocol="%(protocol)s", chain="%(chain)s"]
+
+[sshd]
+enabled = true
+mode    = normal
+port    = ssh
+logpath = %(sshd_log)s
+backend = %(sshd_backend)s
+
+[pam-generic]
+enabled = true
+banaction = %(banaction_allports)s
+logpath  = %(syslog_authpriv)s
+backend  = %(syslog_backend)s

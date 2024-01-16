@@ -11,14 +11,18 @@
       include_role:
         name: users
       when: flags[env]['users']
-    - name: Alerting
-      include_role:
-        name: alerting
-      when: flags[env]['alerting']
     - name: SSH
       include_role:
         name: ssh
       when: flags[env]['ssh']
+    - name: Fail2ban
+      include_role:
+        name: fail2ban
+      when: flags[env]['fail2ban']
+    - name: Alerting
+      include_role:
+        name: alerting
+      when: flags[env]['alerting']
     - name: Backblaze B2 backups
       include_role:
         name: backblaze

@@ -1,0 +1,26 @@
+- name: Add templated config file /etc/fail2ban/jail.local
+  ansible.builtin.template:
+    src: ../files/jail.local
+    dest: /etc/fail2ban/jail.local
+    owner: root
+    group: root
+    mode: '0755'
+  become: true
+  register: fail2ban_conf
+
+- name: Restart fail2ban systemd service
+  ansible.builtin.systemd_service:
+    name: fail2ban.service
+    state: restarted
+    scope: system
+    enabled: true
+  become: true
+  when: fail2ban_conf.changed
+
+- name: Enable fail2ban systemd service
+  ansible.builtin.systemd_service:
+    name: fail2ban.service
+    state: started
+    scope: system
+    enabled: true
+  become: true

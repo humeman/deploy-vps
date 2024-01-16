@@ -1,0 +1,4 @@
+- name: Install dependencies
+  include_tasks: dependencies.yml
+- name: Set up fail2ban
+  include_tasks: setup.yml

@@ -3,11 +3,13 @@ flags:
     setup: true
     users: true
     ssh: true
+    fail2ban: true
     alerting: true
     backblaze: true
   prod:
     setup: true
     users: true
     ssh: true
+    fail2ban: true
     alerting: true
     backblaze: true
