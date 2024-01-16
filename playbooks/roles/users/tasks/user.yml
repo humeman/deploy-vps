@@ -47,7 +47,7 @@
 - name: Set up shell for {{ item["name"] }}
   block:
     - name: Install omz as {{ item["name"] }}
-      ansible.builtin.command: chsh --shell $(which zsh) {{ item["name"] }}
+      ansible.builtin.shell: chsh --shell $(which zsh) {{ item["name"] }}
       become: true
 
     - name: Install omz as {{ item["name"] }}
