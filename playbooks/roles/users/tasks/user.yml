@@ -63,4 +63,4 @@
         group: '{{ item["name"] }}'
       become: true
 
-  #when: item["name"] not in getent_passwd.keys()
+  when: item["name"] not in getent_passwd.keys()
