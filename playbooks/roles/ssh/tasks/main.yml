@@ -1,0 +1,8 @@
+- name: Add templated config file /etc/ssh/sshd_config
+  ansible.builtin.template:
+    src: ../files/sshd_config
+    dest: /etc/ssh/sshd_config
+    owner: root
+    group: root
+    mode: '0755'
+  become: true
