@@ -2,7 +2,7 @@
   ansible.builtin.file:
     path: /scripts/backblaze
     state: directory
-    node: '0755'
+    mode: '0755'
   become: true
 
 - name: Add templated script b2-backup.sh
