@@ -1,0 +1,31 @@
+- name: Create user {{ item["name"] }}
+  ansible.builtin.user:
+    name: '{{ item["name"] }}'
+    append: true
+    groups: '{{ item["groups"] }}'
+    password: "*"
+    create_home: true
+    state: '{{ item["state"] }}'
+
+- name: Create authorized_keys file for {{ item["name"] }}
+  block:
+    - name: Add .ssh folder
+      ansible.builtin.file:
+        path: /home/{{ item["name"] }}/.ssh
+        state: directory
+        mode: '0600'
+        owner: '{{ item["name"] }}'
+        group: '{{ item["name"] }}'
+
+    - name: Add authorized_keys file
+      ansible.builtin.template:
+        src: ../files/authorized_keys
+        dest: /home/{{ item["name"] }}/.ssh/authorized_keys
+        mode: '0700'
+        owner: '{{ item["name"] }}'
+        group: '{{ item["name"] }}'
+  when:
+    - item["state"] == "present"
+    - item["ssh_keys"] is defined
+    - item["ssh_keys"] is iterable
+    - item["ssh_keys"] | length > 0

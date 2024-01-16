@@ -1,9 +1,13 @@
 flags:
   dev:
     setup: true
+    users: true
+    ssh: true
     alerting: true
     backblaze: true
   prod:
     setup: true
+    users: true
+    ssh: true
     alerting: true
     backblaze: true
