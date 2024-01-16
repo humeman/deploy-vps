@@ -4,6 +4,9 @@ Description=Sends service alerts to a Discord webhook
 [Service]
 Type=oneshot
 ExecStart=/bin/bash /scripts/notifier/notify.sh %i
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=notifier@%i
 
 [Install]
 WantedBy=multi-user.target

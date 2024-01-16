@@ -5,8 +5,6 @@
 # delay: 1 to delay for 5 minutes, 0 to run immediately
 # count: number of executions, timeout at 10
 
-set -e
-
 readonly MAX_RETRIES=10
 readonly RETRY_DELAY=300
 

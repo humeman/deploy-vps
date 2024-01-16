@@ -5,7 +5,10 @@ OnFailure=notifier@%i.service
 
 [Service]
 Type=oneshot
-ExecStart=/bin/bash /scripts/backblaze/b2-backup-all.sh
+ExecStart=/bin/bash /scripts/backblaze/b2-backup.sh
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=duplicity-backup
 
 [Install]
 WantedBy=multi-user.target
