@@ -6,6 +6,7 @@
     password: "*"
     create_home: true
     state: '{{ item["state"] }}'
+  become: true
 
 - name: Create authorized_keys file for {{ item["name"] }}
   block:
@@ -16,6 +17,7 @@
         mode: '0600'
         owner: '{{ item["name"] }}'
         group: '{{ item["name"] }}'
+      become: true
 
     - name: Add authorized_keys file
       ansible.builtin.template:
@@ -24,6 +26,7 @@
         mode: '0700'
         owner: '{{ item["name"] }}'
         group: '{{ item["name"] }}'
+      become: true
   when:
     - item["state"] == "present"
     - item["ssh_keys"] is defined
