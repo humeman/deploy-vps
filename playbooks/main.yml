@@ -7,6 +7,10 @@
       include_role:
         name: setup
       when: flags[env]['setup']
+    - name: Users
+      include_role:
+        name: users
+      when: flags[env]['users']
     - name: Alerting
       include_role:
         name: alerting
