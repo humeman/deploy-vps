@@ -13,9 +13,9 @@
       ansible.builtin.file:
         path: /home/{{ item["name"] }}/.ssh
         state: directory
-        mode: '0700'
-      become: true
-      become_user: '{{ item["name"] }}'
+        mode: '0600'
+        owner: '{{ item["name"] }}'
+        group: '{{ item["name"] }}'
 
     - name: Add authorized_keys file
       ansible.builtin.template:
@@ -24,8 +24,8 @@
         owner: root
         group: root
         mode: '0700'
-      become: true
-      become_user: '{{ item["name"] }}'
+        owner: '{{ item["name"] }}'
+        group: '{{ item["name"] }}'
   when:
     - item["state"] == "present"
     - item["ssh_keys"] is defined
