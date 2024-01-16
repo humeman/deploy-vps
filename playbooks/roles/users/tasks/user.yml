@@ -9,6 +9,11 @@
   become: true
   register: user
 
+- name: Delete password for {{ item["name"] }}
+  ansible.builtin.command: passwd --delete {{ item["name"] }}
+  become: true
+  #when: user.changed
+
 - name: Expire password for {{ item["name"] }}
   ansible.builtin.command: passwd --expire {{ item["name"] }}
   become: true
