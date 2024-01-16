@@ -21,8 +21,6 @@
       ansible.builtin.template:
         src: ../files/authorized_keys
         dest: /home/{{ item["name"] }}/.ssh/authorized_keys
-        owner: root
-        group: root
         mode: '0700'
         owner: '{{ item["name"] }}'
         group: '{{ item["name"] }}'
