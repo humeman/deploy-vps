@@ -1,0 +1,26 @@
+- name: Create users as defined in vault
+  block:
+    - name: Create user {{ item["name"] }}
+      ansible.builtin.user:
+        name: {{ item["name"] }}
+        append: true
+        groups: {{ item["groups"] }}
+        password: "*"
+        create_home: true
+        state: {{ item["state"] }}
+
+    - name: Create authorized_keys file for {{ item["name"] }}
+      ansible.builtin.template:
+        src: ../files/authorized_keys
+        dest: /home/{{ item["name"] }}/.ssh/authorized_keys
+        owner: root
+        group: root
+        mode: '0700'
+      when:
+        - items["state"] == "present"
+        - items["ssh_keys"] is defined
+        - items["ssh_keys"] is iterable
+        - items["ssh_keys"] | length > 0
+
+  become: true
+  loop: "{{ users }}"
