@@ -10,17 +10,27 @@
         state: {{ item["state"] }}
 
     - name: Create authorized_keys file for {{ item["name"] }}
-      ansible.builtin.template:
-        src: ../files/authorized_keys
-        dest: /home/{{ item["name"] }}/.ssh/authorized_keys
-        owner: root
-        group: root
-        mode: '0700'
+      block:
+        - name: Add .ssh folder
+          ansible.builtin.file:
+            path: /home/{{ item["name"] }}/.ssh
+            state: directory
+            mode: '0700'
+          become: true
+          become_user: {{ item["name"] }}
+
+        - name: Add authorized_keys file
+          ansible.builtin.template:
+            src: ../files/authorized_keys
+            dest: /home/{{ item["name"] }}/.ssh/authorized_keys
+            owner: root
+            group: root
+            mode: '0700'
+          become: true
+          become_user: {{ item["name"] }}
       when:
         - items["state"] == "present"
         - items["ssh_keys"] is defined
         - items["ssh_keys"] is iterable
         - items["ssh_keys"] | length > 0
-
-  become: true
   loop: "{{ users }}"
