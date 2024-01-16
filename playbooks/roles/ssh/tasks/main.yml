@@ -6,3 +6,11 @@
     group: root
     mode: '0755'
   become: true
+  register: sshd_conf
+
+- name: Restart sshd service
+  ansible.builtin.systemd_service:
+    name: sshd
+    state: reloaded
+  become: true
+  when: sshd_conf.changed

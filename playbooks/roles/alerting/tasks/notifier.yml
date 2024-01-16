@@ -21,7 +21,9 @@
     owner: root
     group: root
   become: true
+  register: systemd_conf
 
 - name: Validate notifier systemd service
   ansible.builtin.command: systemd-analyze verify /etc/systemd/system/notifier@.service
   become: true
+  when: systemd_conf.changed
