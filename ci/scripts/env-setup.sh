@@ -33,10 +33,10 @@ gsutil cp gs://${!BUCKET}/vault .
 echo "-- Cleaning up --"
 rm service.json
 gcloud auth revoke --all
-unset ${!SA}
-unset ${!BUCKET}
-unset ${!ANSIBLE_VAULT_K}
-unset ${!SSH_KEY}
-unset ${!SSH_SUDO}
+unset ${SA}
+unset ${BUCKET}
+unset ${ANSIBLE_VAULT_K}
+unset ${SSH_KEY}
+unset ${SSH_SUDO}
 
 echo "-- Ready to go! --"
