@@ -7,6 +7,12 @@
     create_home: true
     state: '{{ item["state"] }}'
   become: true
+  register: user
+
+- name: Expire password for {{ item["name"] }}
+  ansible.builtin.command: passwd --expire {{ item["name"] }}
+  become: true
+  #when: user.changed
 
 - name: Create authorized_keys file for {{ item["name"] }}
   block:
