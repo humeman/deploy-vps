@@ -1,23 +1,23 @@
 - name: Create user {{ item["name"] }}
-  ansible.builtin.user:
-    name: '{{ item["name"] }}'
-    append: true
-    groups: '{{ item["groups"] }}'
-    password: "*"
-    create_home: true
-    state: '{{ item["state"] }}'
-  become: true
-  register: user
+  block:
+    - name: Create user
+      ansible.builtin.user:
+        name: '{{ item["name"] }}'
+        append: true
+        groups: '{{ item["groups"] }}'
+        password: "*"
+        create_home: true
+        state: '{{ item["state"] }}'
+      become: true
 
-- name: Delete password for {{ item["name"] }}
-  ansible.builtin.command: passwd --delete {{ item["name"] }}
-  become: true
-  when: user.changed
+    - name: Delete password for {{ item["name"] }}
+      ansible.builtin.command: passwd --delete {{ item["name"] }}
+      become: true
 
-- name: Expire password for {{ item["name"] }}
-  ansible.builtin.command: passwd --expire {{ item["name"] }}
-  become: true
-  when: user.changed
+    - name: Expire password for {{ item["name"] }}
+      ansible.builtin.command: passwd --expire {{ item["name"] }}
+      become: true
+  when: item["name"] not in getent_passwd.keys()
 
 - name: Create authorized_keys file for {{ item["name"] }}
   block:
