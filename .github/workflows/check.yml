@@ -10,15 +10,17 @@ env:
   SSH_HOST_DEV: ${{ secrets.SSH_HOST_DEV }}
   SSH_USER_DEV: ${{ secrets.SSH_USER_DEV }}
   SSH_SUDO_DEV: ${{ secrets.SSH_SUDO_DEV }}
-  ANSIBLE_VAULT_DEV: ${{ secrets.ANSIBLE_VAULT_DEV }}
   ANSIBLE_VAULT_K_DEV: ${{ secrets.ANSIBLE_VAULT_K_DEV }}
+  SA_DEV: ${{ secrets.SA_DEV }}
+  BUCKET_DEV: ${{ secrets.BUCKET_DEV }}
 
   SSH_KEY_PROD: ${{ secrets.SSH_KEY_PROD }}
   SSH_HOST_PROD: ${{ secrets.SSH_HOST_PROD }}
   SSH_USER_PROD: ${{ secrets.SSH_USER_PROD }}
   SSH_SUDO_PROD: ${{ secrets.SSH_SUDO_PROD }}
-  ANSIBLE_VAULT_PROD: ${{ secrets.ANSIBLE_VAULT_PROD }}
   ANSIBLE_VAULT_K_PROD: ${{ secrets.ANSIBLE_VAULT_K_PROD }}
+  SA_PROD: ${{ secrets.SA_PROD }}
+  BUCKET_PROD: ${{ secrets.BUCKET_PROD }}
 
   
 
