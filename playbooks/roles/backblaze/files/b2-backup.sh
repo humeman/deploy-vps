@@ -12,6 +12,7 @@ duplicity \
     --full-if-older-than 20D \
     --include '/home' \
     --exclude '**' \
+    --no-encryption \
     / b2://{{ b2_account }}:{{ b2_key }}@{{ b2_bucket }}/backups
 
 # Cleanup failures

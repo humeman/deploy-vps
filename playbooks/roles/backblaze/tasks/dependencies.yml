@@ -3,4 +3,5 @@
     update_cache: yes
     pkg:
     - duplicity>=0.8.08
+    - python3-b2sdk
   become: true
