@@ -1,6 +1,8 @@
 - name: Gather user list
   getent:
     database: passwd
+- name: Install dependencies
+  include_tasks: dependencies.yml
 - name: Create users
   include_tasks: user.yml
   loop: '{{ users }}'

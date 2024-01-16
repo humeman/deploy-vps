@@ -1,0 +1,7 @@
+- name: Install ZSH
+  ansible.builtin.apt:
+    update_cache: yes
+    pkg:
+    - zsh
+    - curl
+  become: true

@@ -43,3 +43,24 @@
     - item["ssh_keys"] is defined
     - item["ssh_keys"] is iterable
     - item["ssh_keys"] | length > 0
+
+- name: Set up shell for {{ item["name"] }}
+  block:
+    - name: Install omz as {{ item["name"] }}
+      ansible.builtin.command: chsh --shell $(which zsh) {{ item["name"] }}
+      become: true
+
+    - name: Install omz as {{ item["name"] }}
+      ansible.builtin.command: runuser -l {{ item["name"] }} -c 'sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended'
+      become: true
+
+    - name: Replace zshrc for {{ item["name"] }}
+      ansible.builtin.template:
+        src: ../files/.zshrc
+        dest: /home/{{ item["name"] }}/.zshrc
+        mode: '0644'
+        owner: '{{ item["name"] }}'
+        group: '{{ item["name"] }}'
+      become: true
+
+  #when: item["name"] not in getent_passwd.keys()
