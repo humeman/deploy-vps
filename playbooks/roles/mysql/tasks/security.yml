@@ -16,6 +16,7 @@
   register: mysql_script
 
 - name: Execute templated script secure-setup.sh
-  ansible.builtin.script: /scripts/mysql/secure-setup.sh 
+  ansible.builtin.script: 
+    remote_src: /scripts/mysql/secure-setup.sh 
   become: true
-  when: mysql_script.changed
+  #when: mysql_script.changed
