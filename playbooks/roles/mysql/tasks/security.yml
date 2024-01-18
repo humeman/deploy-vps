@@ -4,6 +4,7 @@
     state: directory
     mode: '0755'
   become: true
+  register: mysql_script
 
 - name: Add templated script secure-setup.sh
   ansible.builtin.template:
