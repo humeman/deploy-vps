@@ -1,0 +1,17 @@
+- name: Install UFW
+  ansible.builtin.apt:
+    update_cache: yes
+    pkg:
+    - ufw
+  become: true
+
+- name: Add UFW rule for SSH
+  community.general.ufw:
+    rule: allow
+    port: 22
+    comment: Allow OpenSSH connections
+  become: true
+
+- name: Enable UFW
+  community.general.ufw:
+    rule: enabled

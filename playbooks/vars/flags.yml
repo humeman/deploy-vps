@@ -6,6 +6,7 @@ flags:
     fail2ban: true
     alerting: true
     backblaze: true
+    mysql: true
   prod:
     setup: true
     users: true
@@ -13,3 +14,4 @@ flags:
     fail2ban: true
     alerting: true
     backblaze: true
+    mysql: true

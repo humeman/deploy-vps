@@ -1,0 +1,9 @@
+- name: Install general dependencies
+  ansible.builtin.apt:
+    update_cache: yes
+    pkg:
+    - vim
+    - tmux
+    - git
+    - python3
+  become: true

@@ -27,3 +27,7 @@
       include_role:
         name: backblaze
       when: flags[env]['backblaze']
+    - name: MySQL
+      include_role:
+        name: mysql
+      when: flags[env]['mysql']

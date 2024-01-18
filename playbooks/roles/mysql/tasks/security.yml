@@ -1,0 +1,21 @@
+- name: Add scripts/mysql folder
+  ansible.builtin.file:
+    path: /scripts/mysql
+    state: directory
+    mode: '0755'
+  become: true
+
+- name: Add templated script secure-setup.sh
+  ansible.builtin.template:
+    src: ../files/secure-setup.sh
+    dest: /scripts/mysql/secure-setup.sh
+    owner: root
+    group: root
+    mode: '0700'
+  become: true
+  register: mysql_script
+
+- name: Execute templated script secure-setup.sh
+  ansible.builtin.script: /scripts/mysql/secure-setup.sh 
+  become: true
+  when: mysql_script.changed

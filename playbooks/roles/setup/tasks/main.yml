@@ -4,7 +4,14 @@
     state: directory
     mode: '0755'
   become: true
+  
 - name: Set hostname
   ansible.builtin.hostname: 
     name: '{{ hostname }}'
   become: true
+
+- name: Install dependencies
+  include_tasks: dependencies.yml
+
+- name: Perform initial UFW setup
+  include_tasks: ufw.yml

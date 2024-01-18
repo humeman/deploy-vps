@@ -4,6 +4,9 @@ set -e
 
 . main/ci/scripts/env-setup.sh $1
 
+echo "-- Installing requrements from galaxy --"
+ansible-galaxy install -r main/playbooks/requirements.yml
+
 echo "-- Executing playbook on environment $1 --"
 ansible-playbook \
     -i inventory \
