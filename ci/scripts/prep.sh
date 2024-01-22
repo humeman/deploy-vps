@@ -14,4 +14,4 @@ echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.clou
 sudo apt update && sudo apt install google-cloud-cli
 
 echo "-- Verifying dependencies --"
-apt install -y jq coreutils
+sudo apt install -y jq coreutils
