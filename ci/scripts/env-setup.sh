@@ -4,10 +4,10 @@ set -e
 
 echo "-- Expanding host variables --"
 SECRETS="SECRETS_$1"
-JSON=$(echo ${!SECRETS} | base64 --decode)
+JSON=$(echo "${!SECRETS}" | base64 --decode)
 
 export SSH_USER=$(echo $JSON | jq '.user')
-export SSH_HOST=$(echo $JSON | jq '.host')
+SSH_HOST=$(echo $JSON | jq '.host')
 echo $JSON | jq '.sudo' > sudo
 echo $JSON | jq '.key' | base64 --decode > id_rsa
 chmod 0600 id_rsa
