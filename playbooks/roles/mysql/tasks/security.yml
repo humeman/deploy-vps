@@ -18,4 +18,4 @@
 - name: Execute templated script secure-setup.sh
   ansible.builtin.command: /bin/bash /scripts/mysql/secure-setup.sh 
   become: true
-  #when: mysql_script.changed
+  when: mysql_script.changed

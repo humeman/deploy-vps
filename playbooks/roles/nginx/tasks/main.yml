@@ -1,0 +1,11 @@
+- name: Install dependencies
+  include_tasks: dependencies.yml
+
+- name: Apply firewall rules
+  include_tasks: firewall.yml
+
+- name: Create user
+  include_tasks: user.yml
+
+- name: Apply config
+  include_tasks: config.yml

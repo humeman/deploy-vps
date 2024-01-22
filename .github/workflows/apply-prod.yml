@@ -4,13 +4,7 @@ on:
   workflow_dispatch: {}
 
 env:
-  SSH_KEY_PROD: ${{ secrets.SSH_KEY_PROD }}
-  SSH_HOST_PROD: ${{ secrets.SSH_HOST_PROD }}
-  SSH_USER_PROD: ${{ secrets.SSH_USER_PROD }}
-  SSH_SUDO_PROD: ${{ secrets.SSH_SUDO_PROD }}
-  ANSIBLE_VAULT_K_PROD: ${{ secrets.ANSIBLE_VAULT_K_PROD }}
-  SA_PROD: ${{ secrets.SA_PROD }}
-  BUCKET_PROD: ${{ secrets.BUCKET_PROD }}
+  SECRETS_PROD: ${{ secrets.PROD }}
 
 
 jobs:

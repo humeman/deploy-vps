@@ -1,0 +1,6 @@
+- name: Install Nginx dependencies
+  ansible.builtin.apt:
+    update_cache: yes
+    pkg:
+    - nginx
+  become: true

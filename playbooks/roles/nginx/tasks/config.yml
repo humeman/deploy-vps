@@ -1,0 +1,28 @@
+- name: Create config file /etc/nginx/nginx.conf
+  ansible.builtin.template:
+    src: ../files/nginx.conf
+    dest: /etc/nginx/nginx.conf
+    owner: root
+    group: root
+  become: true
+  register: nginx_conf
+
+- name: Validate nginx.conf
+  ansible.builtin.command: nginx -t
+  become: true
+  when: nginx_conf.changed
+
+- name: Restart nginx
+  ansible.builtin.systemd_service:
+    name: nginx.service
+    state: restarted
+    scope: system
+    enabled: true
+  become: true
+  when: nginx_conf.changed
+
+- name: Remove default site
+  ansible.builtin.file:
+    path: /var/www/html
+    state: absent
+  become: true

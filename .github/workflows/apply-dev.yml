@@ -6,13 +6,7 @@ on:
       - main
 
 env:
-  SSH_KEY_DEV: ${{ secrets.SSH_KEY_DEV }}
-  SSH_HOST_DEV: ${{ secrets.SSH_HOST_DEV }}
-  SSH_USER_DEV: ${{ secrets.SSH_USER_DEV }}
-  SSH_SUDO_DEV: ${{ secrets.SSH_SUDO_DEV }}
-  ANSIBLE_VAULT_K_DEV: ${{ secrets.ANSIBLE_VAULT_K_DEV }}
-  SA_DEV: ${{ secrets.SA_DEV }}
-  BUCKET_DEV: ${{ secrets.BUCKET_DEV }}
+  SECRETS_DEV: ${{ secrets.DEV }}
 
 jobs:
   build:
