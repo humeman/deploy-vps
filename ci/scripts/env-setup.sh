@@ -49,11 +49,13 @@ if [ "${AUTH_GCLOUD:-0}" -eq "1" ]; then
     echo "-- Authenticating SA --"
     gcloud auth activate-service-account --key-file=.data/service.json
     rm ".data/service.json"
-    gcloud auth revoke --all
 fi
 
 echo "-- Downloading vault --"
 gsutil cp gs://${BUCKET}/${REPO_NAME}/vault .data/
+if [ "${AUTH_GCLOUD:-0}" -eq "1" ]; then
+    gcloud auth revoke --all
+fi
 unset BUCKET
 
 echo "-- Ready to go! --"
