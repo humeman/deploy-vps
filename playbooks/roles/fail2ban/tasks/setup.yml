@@ -9,7 +9,7 @@
   register: fail2ban_conf
 
 - name: Restart fail2ban systemd service
-  ansible.builtin.systemd_service:
+  ansible.builtin.systemd:
     name: fail2ban.service
     state: restarted
     scope: system
@@ -18,7 +18,7 @@
   when: fail2ban_conf.changed
 
 - name: Enable fail2ban systemd service
-  ansible.builtin.systemd_service:
+  ansible.builtin.systemd:
     name: fail2ban.service
     state: started
     scope: system

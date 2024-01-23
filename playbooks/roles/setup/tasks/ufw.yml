@@ -8,7 +8,7 @@
 - name: Add UFW rule for SSH
   community.general.ufw:
     rule: allow
-    port: 22
+    port: "22"
     comment: Allow OpenSSH connections
   become: true
 

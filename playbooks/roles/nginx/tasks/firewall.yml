@@ -1,13 +1,13 @@
 - name: Add UFW rule @ port 80 for Nginx
   community.general.ufw:
     rule: allow
-    port: 80
+    port: "80"
     comment: Allow Nginx HTTP/80 connections
   become: true
 
 - name: Add UFW rule @ port 443 for Nginx
   community.general.ufw:
     rule: allow
-    port: 443
+    port: "443"
     comment: Allow Nginx HTTP/443 connections
   become: true

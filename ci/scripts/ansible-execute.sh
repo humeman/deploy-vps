@@ -2,18 +2,15 @@
 
 set -e
 
-. main/ci/scripts/env-setup.sh $1
+. "${SCRIPT_PATH}/env-setup.sh" $1
 
 echo "-- Installing requrements from galaxy --"
-ansible-galaxy install -r main/playbooks/requirements.yml
+ansible-galaxy install -r "${REPO_PATH}/playbooks/requirements.yml"
 
 echo "-- Executing playbook on environment $1 --"
 ansible-playbook \
-    -i inventory \
-    -u "${!SSH_USER}" \
-    -e @vault \
-    --vault-password-file vault_k \
-    --private-key id_rsa \
-    --become-user root \
-    --become-password-file sudo \
-    main/playbooks/main.yml
+    -i ".data/inventory" \
+    -e @.data/vault \
+    --vault-password-file ".data/vault_k" \
+    --private-key ".data/id_rsa" \
+    "${REPO_PATH}/playbooks/main.yml"

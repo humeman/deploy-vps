@@ -8,6 +8,12 @@ on:
 env:
   SECRETS_DEV: ${{ secrets.DEV }}
   SECRETS_PROD: ${{ secrets.PROD }}
+  
+  AUTH_GCLOUD: "1"
+  IS_CI: "1"
+  SCRIPT_PATH: "main/ci/scripts"
+  REPO_PATH: "pr"
+  REPO_NAME: "deploy-vps"
 
 jobs:
   build:

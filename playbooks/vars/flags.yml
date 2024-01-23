@@ -7,6 +7,7 @@ flags:
     alerting: true
     backblaze: true
     mysql: true
+    nginx: true
   prod:
     setup: true
     users: true
@@ -15,3 +16,4 @@ flags:
     alerting: true
     backblaze: true
     mysql: true
+    nginx: true

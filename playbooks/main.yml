@@ -31,3 +31,7 @@
       include_role:
         name: mysql
       when: flags[env]['mysql']
+    - name: Nginx
+      include_role:
+        name: nginx
+      when: flags[env]['nginx']

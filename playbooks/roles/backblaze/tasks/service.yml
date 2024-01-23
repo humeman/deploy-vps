@@ -43,7 +43,7 @@
   when: systemd_conf.changed
 
 - name: Enable duplicity-backup systemd timer
-  ansible.builtin.systemd_service:
+  ansible.builtin.systemd:
     name: duplicity-backup.timer
     state: started
     scope: system

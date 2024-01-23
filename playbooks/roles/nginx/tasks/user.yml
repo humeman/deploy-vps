@@ -1,7 +1,6 @@
 - name: Create user www
   ansible.builtin.user:
     name: www
-    groups: www
     shell: /sbin/nologin
     append: true
     create_home: true

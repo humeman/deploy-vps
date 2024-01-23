@@ -1,0 +1,26 @@
+version: '3'
+
+tasks:
+  check:
+    env:
+      AUTH_GCLOUD: 0
+      IS_CI: 0
+      SCRIPT_PATH: "ci/scripts"
+      REPO_PATH: "."
+      REPO_NAME: "deploy-vps"
+    cmds:
+      - bash ci/scripts/task-verify.sh
+      - defer: bash ci/scripts/clean.sh
+      - bash ci/scripts/ansible-check.sh $ENV
+
+  deploy:
+    env:
+      AUTH_GCLOUD: 0
+      IS_CI: 0
+      SCRIPT_PATH: "ci/scripts"
+      REPO_PATH: "."
+      REPO_NAME: "deploy-vps"
+    cmds:
+      - bash ci/scripts/task-verify.sh
+      - defer: bash ci/scripts/clean.sh
+      - bash ci/scripts/ansible-execute.sh $ENV
