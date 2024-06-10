@@ -1,4 +1,77 @@
-- name: Install dependencies
-  include_tasks: dependencies.yml
-- name: Set up fail2ban
-  include_tasks: setup.yml
+- name: Add scripts/fail2ban folder
+  ansible.builtin.file:
+    path: /scripts/fail2ban
+    state: directory
+    mode: '0755'
+  become: true
+
+- name: Add state/fail2ban folder
+  ansible.builtin.file:
+    path: /state/fail2ban
+    state: directory
+    mode: '0755'
+  become: true
+
+- name: Add templated script install.sh
+  ansible.builtin.template:
+    src: ../files/install.sh
+    dest: /scripts/fail2ban/install.sh
+    owner: root
+    group: root
+    mode: '0700'
+  become: true
+
+- name: Execute templated script install.sh
+  ansible.builtin.command: /bin/bash /scripts/fail2ban/install.sh 
+  become: true
+
+- name: Add templated config file /etc/fail2ban/jail.local
+  ansible.builtin.template:
+    src: ../files/jail.local
+    dest: /etc/fail2ban/jail.local
+    owner: root
+    group: root
+    mode: '0755'
+  become: true
+  register: fail2ban_conf
+
+- name: Add templated config file /etc/fail2ban/filter.d/postfix-flood-attack.conf
+  ansible.builtin.template:
+    src: ../files/filter.d/postfix-flood-attack.conf
+    dest: /etc/fail2ban/filter.d/postfix-flood-attack.conf
+    owner: root
+    group: root
+    mode: '0755'
+  become: true
+  register: filter_d_1_file
+
+- name: Add templated config file /etc/fail2ban/filter.d/dovecot-pop3imap.conf
+  ansible.builtin.template:
+    src: ../files/filter.d/dovecot-pop3imap.conf
+    dest: /etc/fail2ban/filter.d/dovecot-pop3imap.conf
+    owner: root
+    group: root
+    mode: '0755'
+  become: true
+  register: filter_d_2_file
+
+- name: Restart fail2ban systemd service
+  ansible.builtin.systemd:
+    name: fail2ban.service
+    state: restarted
+    scope: system
+    enabled: true
+  become: true
+  when: >
+    fail2ban_conf.changed or
+    filter_d_1_file.changed or
+    filter_d_2_file.changed
+
+
+- name: Enable fail2ban systemd service
+  ansible.builtin.systemd:
+    name: fail2ban.service
+    state: started
+    scope: system
+    enabled: true
+  become: true

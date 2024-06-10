@@ -1,0 +1,27 @@
+- name: Add UFW rule @ port 25 for SMTP
+  community.general.ufw:
+    rule: allow
+    port: "25"
+    comment: Allow Postfix SMTP/25 connections
+  become: true
+
+- name: Add UFW rule @ port 465 for submission
+  community.general.ufw:
+    rule: allow
+    port: "465"
+    comment: Allow Postfix submission/465 connections
+  become: true
+  
+- name: Add UFW rule @ port 587 for submission
+  community.general.ufw:
+    rule: allow
+    port: "587"
+    comment: Allow Postfix submission/587 connections
+  become: true
+
+- name: Add UFW rule @ port 143 for IMAP
+  community.general.ufw:
+    rule: allow
+    port: "993"
+    comment: Allow Dovecot IMAP/993 connections
+  become: true

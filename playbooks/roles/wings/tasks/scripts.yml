@@ -1,0 +1,16 @@
+- name: Add scripts/wings folder
+  ansible.builtin.file:
+    path: /scripts/wings
+    state: directory
+    mode: '0755'
+  become: true
+  
+- name: Add templated script install-wings.sh
+  ansible.builtin.template:
+    src: ../files/install-wings.sh
+    dest: /scripts/wings/install-wings.sh
+    owner: root
+    group: root
+    mode: '0700'
+  become: true
+  register: wings_download_script

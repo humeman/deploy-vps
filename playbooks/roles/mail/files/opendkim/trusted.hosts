@@ -1,0 +1,6 @@
+127.0.0.1
+localhost
+
+{% for item in mail["dkim_hosts"] %}
+.{{ item }}
+{% endfor %}

@@ -1,0 +1,31 @@
+- name: Add scripts/mail folder
+  ansible.builtin.file:
+    path: /scripts/mail
+    state: directory
+    mode: '0755'
+  become: true
+
+- name: Add state/mail folder
+  ansible.builtin.file:
+    path: /state/mail
+    state: directory
+    mode: '0755'
+  become: true
+
+- name: Add templated script postfixadmin/mysql.sh
+  ansible.builtin.template:
+    src: ../files/postfixadmin/mysql.sh
+    dest: /scripts/mail/postfixadmin-mysql.sh
+    owner: root
+    group: root
+    mode: '0700'
+  become: true
+
+- name: Add templated script mail-reload.sh
+  ansible.builtin.template:
+    src: ../files/mail-reload.sh
+    dest: /etc/letsencrypt/renewal-hooks/deploy/mail-reload.sh
+    owner: root
+    group: root
+    mode: '0755'
+  become: true

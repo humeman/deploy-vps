@@ -20,6 +20,10 @@ if [ -f ".data/vault_k" ]; then
     rm ".data/vault_k"
 fi
 
+if [ -f ".data/vault" ]; then
+    rm ".data/vault"
+fi
+
 if [ -f ".data/service.json" ]; then
     rm ".data/service.json"
 fi

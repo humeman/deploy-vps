@@ -2,7 +2,29 @@
   remote_user: root
   vars_files:
     - vars/flags.yml
+    - vars/dependency_versions.yml
   tasks:
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: yes
+      become: true
+    - name: Add state folder
+      ansible.builtin.file:
+        path: /state
+        state: directory
+        mode: '0755'
+      become: true
+    - name: Get the current time
+      ansible.builtin.shell: TZ=America/Chicago date "+%m/%d/%Y at %r (%Z)"
+      register: current_time
+    - name: Write latest deploy time to file
+      ansible.builtin.template:
+        src: files/last_deploy
+        dest: /state/last_deploy
+        owner: root
+        group: root
+        mode: '0644'
+      become: true
     - name: Primary node setup
       include_role:
         name: setup
@@ -35,3 +57,27 @@
       include_role:
         name: nginx
       when: flags[env]['nginx']
+    - name: Docker
+      include_role:
+        name: docker
+      when: flags[env]['docker']
+    - name: Pterodactyl
+      include_role:
+        name: pterodactyl
+      when: flags[env]['docker'] and flags[env]['pterodactyl']
+    - name: Wings
+      include_role:
+        name: wings
+      when: flags[env]['docker'] and flags[env]['wings']
+    - name: MongoDB
+      include_role:
+        name: mongodb
+      when: flags[env]['mongodb']
+    - name: Bind9
+      include_role:
+        name: bind9
+      when: flags[env]['bind9']
+    - name: Mail
+      include_role:
+        name: mail
+      when: flags[env]['mail']

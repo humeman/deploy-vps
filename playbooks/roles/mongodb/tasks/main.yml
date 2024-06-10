@@ -1,0 +1,98 @@
+- name: Add scripts/mongodb folder
+  ansible.builtin.file:
+    path: /scripts/mongodb
+    state: directory
+    mode: '0755'
+  become: true
+
+- name: Add templated script admin_setup.js
+  ansible.builtin.template:
+    src: ../files/admin_setup.js
+    dest: /scripts/mongodb/admin_setup.js
+    owner: root
+    group: root
+    mode: '0700'
+  become: true
+
+- name: Add templated script install.sh
+  ansible.builtin.template:
+    src: ../files/install.sh
+    dest: /scripts/mongodb/install.sh
+    owner: root
+    group: root
+    mode: '0700'
+  become: true
+
+- name: Add state/mongodb folder
+  ansible.builtin.file:
+    path: /state/mongodb
+    state: directory
+    mode: '0755'
+  become: true
+
+- name: Execute templated script install.sh
+  ansible.builtin.command: /bin/bash /scripts/mongodb/install.sh 
+  become: true
+
+- name: Stat mongo install state
+  stat:
+    path: /state/mongodb/install
+  become: true
+  register: mongodb_state
+
+- name: Create config file /etc/mongodb.conf (noauth)
+  ansible.builtin.template:
+    src: ../files/mongodb_init.conf
+    dest: /etc/mongodb.conf
+    owner: root
+    group: root
+  become: true
+  when: not mongodb_state.stat.exists
+
+- name: Restart mongod
+  ansible.builtin.systemd:
+    name: mongod.service
+    state: restarted
+    scope: system
+    enabled: true
+  become: true
+  when: not mongodb_state.stat.exists
+
+- name: Execute templated Mongo script admin_setup.js
+  ansible.builtin.command: "mongosh -f /scripts/mongodb/admin_setup.js"
+  when: not mongodb_state.stat.exists
+  become: true
+
+- name: Update config file /etc/mongod.conf
+  ansible.builtin.template:
+    src: ../files/mongod.conf
+    dest: /etc/mongod.conf
+    owner: root
+    group: root
+  when: not mongodb_state.stat.exists
+  become: true
+
+- name: Update config file /etc/mongodb.conf
+  ansible.builtin.template:
+    src: ../files/mongodb.conf
+    dest: /etc/mongodb.conf
+    owner: root
+    group: root
+  when: not mongodb_state.stat.exists
+  become: true
+
+- name: Restart mongod
+  ansible.builtin.systemd:
+    name: mongod.service
+    state: restarted
+    scope: system
+    enabled: true
+  when: not mongodb_state.stat.exists
+  become: true
+
+- name: Store state
+  ansible.builtin.file:
+    path: /state/mongodb/install
+    state: touch
+  when: not mongodb_state.stat.exists
+  become: true

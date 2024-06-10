@@ -35,3 +35,29 @@ enabled = true
 banaction = %(banaction_allports)s
 logpath  = %(syslog_authpriv)s
 backend  = %(syslog_backend)s
+
+{% if flags[env]["mail"] %}
+[postfix-flood-attack]
+enabled  = true
+bantime  = 10m
+filter   = postfix-flood-attack
+action   = iptables-multiport[name=postfix, port="http,https,smtp,submission,pop3,pop3s,imap,imaps,sieve", protocol=tcp]
+logpath  = /var/log/mail.log
+ignoreip = 127.0.0.1/8 ::1
+
+[postfix]
+enabled = true
+maxretry = 3
+bantime = 1h
+filter = postfix
+logpath = /var/log/mail.log
+
+[dovecot-pop3imap]
+enabled = true
+filter = dovecot-pop3imap
+action = iptables-multiport[name=dovecot-pop3imap, port="pop3,imap", protocol=tcp]
+logpath = /var/log/maillog
+maxretry = 20
+findtime = 1200
+bantime = 1200
+{% endif %}

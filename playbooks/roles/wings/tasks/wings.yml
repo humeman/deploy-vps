@@ -1,0 +1,53 @@
+- name: Create Wings config directory
+  ansible.builtin.file:
+    path: '/etc/pterodactyl'
+    state: directory
+    mode: '0755'
+  become: true
+  register: wings_dir
+
+- name: Execute templated script install-wings.sh
+  ansible.builtin.command: /bin/bash /scripts/wings/install-wings.sh 
+  become: true
+
+- name: Update permissions for Wings binaries
+  ansible.builtin.file:
+    path: '/usr/local/bin/wings'
+    mode: '0755'
+  become: true
+
+- name: "Set up Let's Encrypt for panel"
+  include_tasks: "../../certbot/tasks/main.yml"
+  vars:
+    certbot_domain: "{{ pterodactyl['wings_host'] }}"
+    certbot_email: "{{ email_address }}"
+    certbot_flags: ""
+
+- name: Execute Wings configuration command
+  ansible.builtin.command: 
+    cmd: '{{ pterodactyl["wings_init_command"].split(" && ")[1] }}'
+    chdir: "/etc/pterodactyl"
+  become: true
+  when: wings_dir.changed
+
+- name: Create Wings systemd service
+  ansible.builtin.template:
+    src: ../files/wings.service
+    dest: /etc/systemd/system/wings.service
+    owner: root
+    group: root
+  become: true
+  register: wings_systemd_conf
+
+- name: Validate Wings systemd service
+  ansible.builtin.command: systemd-analyze verify /etc/systemd/system/wings.service
+  become: true
+  when: wings_systemd_conf.changed
+
+- name: Enable Wings
+  ansible.builtin.systemd:
+    name: wings.service
+    state: started
+    scope: system
+    enabled: true
+  become: true

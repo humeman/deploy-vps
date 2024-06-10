@@ -1,0 +1,33 @@
+- name: Add UFW rules for Pterodactyl game ports (TCP)
+  community.general.ufw:
+    rule: allow
+    to_port: '{{ item["port"] }}'
+    to_ip: '{{ item["host"] }}'
+    proto: "tcp"
+    comment: Allow Pterodactyl {{ item["host"] }}:{{ item["port"] }} connections (TCP)
+  loop: '{{ pterodactyl["ports"] }}'
+  become: true
+
+- name: Add UFW rules for Pterodactyl game ports (UDP)
+  community.general.ufw:
+    rule: allow
+    to_port: '{{ item["port"] }}'
+    to_ip: '{{ item["host"] }}'
+    proto: "udp"
+    comment: Allow Pterodactyl {{ item["host"] }}:{{ item["port"] }} connections (UDP)
+  loop: '{{ pterodactyl["ports"] }}'
+  become: true
+
+- name: Add UFW rules for Wings panel-node communication
+  community.general.ufw:
+    rule: allow
+    to_port: "8080"
+    comment: Allow Wings node connections
+  become: true
+
+- name: Add UFW rules for Wings SFTP
+  community.general.ufw:
+    rule: allow
+    to_port: "2022"
+    comment: Allow Wings node connections
+  become: true

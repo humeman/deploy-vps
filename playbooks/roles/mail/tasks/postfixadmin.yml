@@ -1,0 +1,124 @@
+- name: Create PostfixAdmin webroot
+  ansible.builtin.file:
+    path: '/var/www/postfixadmin'
+    state: directory
+    mode: '0755'
+  become: true
+
+- name: Download PostfixAdmin
+  ansible.builtin.get_url:
+    url: "{{ downloads[env]['postfixadmin'] }}"
+    dest: '/var/www/postfixadmin/postfixadmin.tar.gz'
+    mode: '0700'
+  register: postfixadmin_download
+  become: true
+
+- name: Extract PostfixAdmin into /var/www/postfixadmin
+  ansible.builtin.unarchive:
+    src: '/var/www/postfixadmin/postfixadmin.tar.gz'
+    dest: '/var/www/postfixadmin'
+    remote_src: true
+    mode: '0755'
+  when: postfixadmin_download.changed
+  become: true
+
+- name: Move PostfixAdmin files into webroot
+  ansible.builtin.shell: "mv /var/www/postfixadmin/postfixadmin-postfixadmin-{{ dependency_versions[env]['postfixadmin'] }}/* /var/www/postfixadmin"
+  when: postfixadmin_download.changed
+  become: true
+
+- name: Remove PostfixAdmin extract
+  ansible.builtin.command: "rm -r /var/www/postfixadmin/postfixadmin-postfixadmin-{{ dependency_versions[env]['postfixadmin'] }}"
+  when: postfixadmin_download.changed
+  become: true
+
+- name: Create PostfixAdmin templates folder
+  ansible.builtin.file:
+    path: '/var/www/postfixadmin/templates_c'
+    state: directory
+    mode: '0775'
+  register: postfixadmin_templates
+  become: true
+
+- name: Set acl for PostfixAdmin templates folder
+  ansible.builtin.command: "setfacl -R -m u:www-data:rwx /var/www/postfixadmin/templates_c/"
+  when: postfixadmin_templates.changed
+  become: true
+
+- name: Set acl for PostfixAdmin Let's Encrypt keys
+  ansible.builtin.command: "setfacl -R -m u:www-data:rx /etc/letsencrypt/live/ /etc/letsencrypt/archive/"
+  when: postfixadmin_templates.changed
+  become: true
+
+- name: Execute templated script postfixadmin-mysql.sh
+  ansible.builtin.command: /bin/bash /scripts/mail/postfixadmin-mysql.sh 
+  become: true
+
+- name: Stat PostfixAdmin hash
+  ansible.builtin.stat: 
+    path: /state/mail/pfa_hash
+  become: true
+  register: pfa_hash_file
+
+- name: Generate PostfixAdmin setup password hash
+  ansible.builtin.shell: >-
+    php -r 'echo password_hash("{{ mail["postfixadmin"]["setup_password"] }}", PASSWORD_DEFAULT);' > /state/mail/pfa_hash
+  when: not pfa_hash_file.stat.exists
+  become: true
+
+- name: Get the PostfixAdmin hash
+  ansible.builtin.slurp: 
+    src: /state/mail/pfa_hash
+  become: true
+  register: pfa_hash_file_content
+
+- name: Add templated config file config.local.php
+  ansible.builtin.template:
+    src: ../files/postfixadmin/config.local.php
+    dest: /var/www/postfixadmin/config.local.php
+    owner: root
+    group: root
+    mode: '0744'
+  become: true
+  register: config_local_php_file
+
+- name: Create nginx site file
+  ansible.builtin.template:
+    src: ../files/postfixadmin/nginx
+    dest: /etc/nginx/sites-available/{{ hostname }}-postfixadmin
+    owner: root
+    group: root
+    mode: "0744"
+  become: true
+  register: nginx_site
+
+- name: Stat nginx site symlink
+  ansible.builtin.stat: 
+    path: /etc/nginx/sites-enabled/{{ hostname }}-postfixadmin
+  become: true
+  register: nginx_site_stat
+
+- name: Create symlink for nginx site
+  ansible.builtin.file:
+    src: /etc/nginx/sites-available/{{ hostname }}-postfixadmin
+    dest: /etc/nginx/sites-enabled/{{ hostname }}-postfixadmin
+    owner: root
+    group: root
+    mode: "0744"
+    state: link
+  become: true
+  when: not nginx_site_stat.stat.exists
+
+- name: Verify nginx site file
+  ansible.builtin.command: nginx -t
+  become: true
+  when: nginx_site.changed
+
+- name: Restart nginx
+  ansible.builtin.systemd:
+    name: nginx.service
+    state: restarted
+    scope: system
+    enabled: true
+  become: true
+  when: nginx_site.changed

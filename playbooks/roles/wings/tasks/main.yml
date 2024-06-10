@@ -1,0 +1,9 @@
+
+- name: Set up scripts
+  include_tasks: scripts.yml
+
+- name: Configure UFW
+  include_tasks: firewall.yml
+
+- name: Install Wings
+  include_tasks: wings.yml

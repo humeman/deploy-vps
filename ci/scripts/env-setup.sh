@@ -32,6 +32,7 @@ if [ "${AUTH_GCLOUD:-0}" -eq "1" ]; then
 fi
 
 echo $JSON | jq -r '.vault_k' > ".data/vault_k"
+chmod 600 ".data/vault_k"
 
 unset ${SECRETS}
 unset JSON

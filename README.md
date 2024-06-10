@@ -21,5 +21,3 @@ When deploying a node initially, use these setup steps:
     - [Disable password auth](https://serverfault.com/questions/285800/how-to-disable-ssh-login-with-password-for-some-users)
     - Add to sudoers
 2. Generate and add an SSH key for `git@github.com`
-
-#

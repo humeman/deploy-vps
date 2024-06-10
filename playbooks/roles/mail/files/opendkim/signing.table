@@ -1,0 +1,4 @@
+{% for item in mail["dkim_hosts"] %}
+*@{{ item }}        default._domainkey.{{ item }}
+*@*.{{ item }}      default._domainkey.{{ item }}
+{% endfor %}

@@ -1,0 +1,53 @@
+- name: Add scripts/pterodactyl folder
+  ansible.builtin.file:
+    path: /scripts/pterodactyl
+    state: directory
+    mode: '0755'
+  become: true
+
+- name: Add state/pterodactyl folder
+  ansible.builtin.file:
+    path: /state/pterodactyl
+    state: directory
+    mode: '0755'
+  become: true
+
+- name: Add templated script add-repositories-1.sh
+  ansible.builtin.template:
+    src: ../files/add-repositories-1.sh
+    dest: /scripts/pterodactyl/add-repositories-1.sh
+    owner: root
+    group: root
+    mode: '0700'
+  become: true
+  register: pterodactyl_add_repositories_1_script
+
+- name: Add templated script add-repositories-2.sh
+  ansible.builtin.template:
+    src: ../files/add-repositories-2.sh
+    dest: /scripts/pterodactyl/add-repositories-2.sh
+    owner: root
+    group: root
+    mode: '0700'
+  become: true
+  register: pterodactyl_add_repositories_2_script
+
+- name: Add templated script mysql.sh
+  ansible.builtin.template:
+    src: ../files/mysql.sh
+    dest: /scripts/pterodactyl/mysql.sh
+    owner: root
+    group: root
+    mode: '0700'
+  become: true
+  register: pterodactyl_mysql_script
+
+- name: Add templated script config-panel.sh
+  ansible.builtin.template:
+    src: ../files/config-panel.sh
+    dest: /scripts/pterodactyl/config-panel.sh
+    owner: root
+    group: root
+    mode: '0700'
+  become: true
+  register: pterodactyl_config_panel_script

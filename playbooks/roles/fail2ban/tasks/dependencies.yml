@@ -1,6 +1,0 @@
-- name: Install fail2ban
-  ansible.builtin.apt:
-    update_cache: yes
-    pkg:
-    - fail2ban
-  become: true

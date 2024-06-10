@@ -4,7 +4,7 @@
     state: directory
     mode: '0755'
   become: true
-  
+
 - name: Set hostname
   ansible.builtin.hostname: 
     name: '{{ hostname }}'
@@ -15,3 +15,51 @@
 
 - name: Perform initial UFW setup
   include_tasks: ufw.yml
+
+- name: "Set up Let's Encrypt for host"
+  include_tasks: "../../certbot/tasks/main.yml"
+  vars:
+    certbot_domain: "{{ hostname }}"
+    certbot_email: "{{ email_address }}"
+    certbot_flags: ""
+
+- name: Capture MOTD files to delete
+  find:
+    paths: /etc/update-motd.d
+    file_type: file
+    excludes: 
+      - "00-motd"
+  register: found_motd_files
+  become: true
+
+- name: Delete MOTD files
+  file:
+    path: "{{ item.path }}"
+    state: absent
+  loop: "{{ found_motd_files.files }}"
+  become: true
+
+- name: Capture MOTD files to delete
+  find:
+    paths: /etc/update-motd.d
+    file_type: link
+    excludes: 
+      - "00-motd"
+  register: found_motd_files
+  become: true
+
+- name: Delete MOTD files
+  file:
+    path: "{{ item.path }}"
+    state: absent
+  loop: "{{ found_motd_files.files }}"
+  become: true
+
+- name: Add templated file /etc/update-motd.d/00-motd
+  ansible.builtin.template:
+    src: ../files/00-motd
+    dest: /etc/update-motd.d/00-motd
+    owner: root
+    group: root
+    mode: '0755'
+  become: true

@@ -1,0 +1,57 @@
+- name: "Set up Let's Encrypt for mail server"
+  include_tasks: "../../certbot/tasks/main.yml"
+  vars:
+    certbot_domain: "{{ mail['host'] }}"
+    certbot_email: "{{ email_address }}"
+    certbot_flags: '--staple-ocsp --deploy-hook "postfix reload; systemctl reload dovecot" --disable-hook-validation'
+
+- name: Install dependencies
+  ansible.builtin.apt:
+    update_cache: no
+    pkg:
+    - postfix
+    - postfix-mysql
+    - dovecot-core
+    - dovecot-imapd
+    - dovecot-lmtpd
+    - dovecot-mysql
+    - dovecot-sieve
+    - opendmarc
+    - php{{ dependency_versions[env]["php"] }}
+    - php{{ dependency_versions[env]["php"] }}-fpm
+    - php{{ dependency_versions[env]["php"] }}-imap
+    - php{{ dependency_versions[env]["php"] }}-mbstring
+    - php{{ dependency_versions[env]["php"] }}-mysql
+    - php{{ dependency_versions[env]["php"] }}-curl
+    - php{{ dependency_versions[env]["php"] }}-zip
+    - php{{ dependency_versions[env]["php"] }}-xml
+    - php{{ dependency_versions[env]["php"] }}-bz2
+    - php{{ dependency_versions[env]["php"] }}-intl
+    - php{{ dependency_versions[env]["php"] }}-gmp
+    - php{{ dependency_versions[env]["php"] }}-redis
+    - acl
+    - spamassassin 
+    - spamc
+    - spamass-milter
+  become: true
+
+- name: Create scripts
+  include_tasks: scripts.yml
+
+- name: Configure firewall
+  include_tasks: firewall.yml
+
+- name: Install PostfixAdmin
+  include_tasks: postfixadmin.yml
+
+- name: Install Dovecot
+  include_tasks: dovecot.yml
+
+- name: Install Postfix
+  include_tasks: postfix.yml
+
+- name: Install OpenDMARC
+  include_tasks: opendmarc.yml
+
+- name: Install SpamAssassin
+  include_tasks: spamassassin.yml

@@ -1,0 +1,46 @@
+- name: Add state/docker folder
+  ansible.builtin.file:
+    path: /state/docker
+    state: directory
+    mode: '0755'
+  become: true
+
+- name: Add scripts/docker folder
+  ansible.builtin.file:
+    path: /scripts/docker
+    state: directory
+    mode: '0755'
+  become: true
+  
+- name: Add templated script add-repository.sh
+  ansible.builtin.template:
+    src: ../files/add-repository.sh
+    dest: /scripts/docker/add-repository.sh
+    owner: root
+    group: root
+    mode: '0700'
+  become: true
+
+- name: Execute templated script add-repository.sh
+  ansible.builtin.command: /bin/bash /scripts/docker/add-repository.sh 
+  become: true
+
+- name: Install Docker
+  apt:
+    pkg: 
+      - docker-ce 
+      - docker-ce-cli 
+      - containerd.io 
+      - docker-buildx-plugin 
+      - docker-compose-plugin
+    state: latest
+    update_cache: true
+  become: true
+
+- name: Enable Docker
+  ansible.builtin.systemd:
+    name: docker.service
+    state: started
+    scope: system
+    enabled: true
+  become: true

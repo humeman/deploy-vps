@@ -1,19 +1,31 @@
 flags:
   dev:
     setup: true
-    users: true
+    users: false
     ssh: true
-    fail2ban: true
-    alerting: true
-    backblaze: true
-    mysql: true
-    nginx: true
+    fail2ban: false
+    alerting: false
+    backblaze: false
+    mysql: false
+    nginx: false
+    docker: false
+    pterodactyl: false
+    wings: false
+    mongodb: false
+    bind9: false
+    mail: false
   prod:
     setup: true
-    users: true
+    users: false
     ssh: true
     fail2ban: true
-    alerting: true
-    backblaze: true
-    mysql: true
-    nginx: true
+    alerting: false
+    backblaze: false
+    mysql: false
+    nginx: false
+    docker: false
+    pterodactyl: false
+    wings: false
+    mongodb: false
+    bind9: false
+    mail: false

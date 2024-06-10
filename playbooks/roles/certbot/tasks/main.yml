@@ -1,0 +1,18 @@
+- name: Install Certbot
+  ansible.builtin.apt:
+    update_cache: no
+    pkg:
+    - certbot
+    - python3-certbot-nginx
+  become: true
+
+- name: Check if certificate for {{ certbot_domain }} already exists
+  stat:
+    path: /etc/letsencrypt/live/{{ certbot_domain | replace('*.', '') }}/cert.pem
+  register: letsencrypt_cert
+  become: true
+
+- name: Generate new certificate for {{ certbot_domain }}
+  command: "certbot certonly --nginx --noninteractive --agree-tos {{ certbot_flags }} --email {{ certbot_email }} -d {{ certbot_domain }}"
+  when: not letsencrypt_cert.stat.exists
+  become: true

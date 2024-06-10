@@ -1,6 +1,6 @@
 - name: Install MariaDB
   ansible.builtin.apt:
-    update_cache: yes
+    update_cache: no
     pkg:
     - mariadb-server
     - mariadb-client

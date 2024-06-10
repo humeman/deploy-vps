@@ -1,0 +1,61 @@
+#!/bin/bash
+
+safe_print() {
+        cat "$1" | head -n 10 | tr -d '\000-\011\013\014\016-\037' | cut -c -80
+}
+
+is_private_ip() {
+    local ip=$1
+    if [[ $ip =~ ^10\. ]] || [[ $ip =~ ^172\.(1[6-9]|2[0-9]|3[01])\. ]] || [[ $ip =~ ^192\.168\. ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+wget -U "$USER_AGENT" -q -O- https://tecktip.today:8325 >"$teck" || result=$?
+if [ $result -ne 0 ]; then
+    teck="There is no teck, and there is no tip... (request failed)"
+fi
+
+cpu_usage=$(top -bn1 | grep "Cpu(s)" | \
+           sed "s/.*, *\([0-9.]*\)%* id.*/\1/" | \
+           awk '{print 100 - $1"%"}')
+mem_usage=$(free -t | awk 'FNR == 2 {printf("%.1f%"), $3/$2*100}')
+disk_usage=$(df / | awk 'NR==2 {print $5}')
+ip_info=$(ip -4 -o addr show scope global | awk '{print $2, $4}')
+result_ips=""
+while read -r line; do
+    if_name=$(echo "$line" | awk '{print $1}')
+    ip_address=$(echo "$line" | awk '{print $2}' | cut -d/ -f1)
+    if ! is_private_ip "$ip_address"; then
+        result_ips+="- ${if_name}: ${ip_address}\n"
+    fi
+done <<< "$ip_info"
+users=$(who | awk '{print $1}' | sort | uniq)
+result_users=""
+while read -r user; do
+    result_users+="- ${user}\n"
+done <<< "$users"
+
+cat <<EOF
+Welcome to {{ hostname }}!
+
+Environment:    {{ env }}
+Server version: $(lsb_release -sd 2>/dev/null)
+Last deploy:    $(cat /state/last_deploy)
+Uptime:         $(uptime -p | cut -d ' ' -f 2-)
+
+Usage:
+- CPU:  $cpu_usage
+- RAM:  $mem_usage
+- Disk: $disk_usage
+
+IP addresses:
+$(echo -e $result_ips)
+
+Currently signed in:
+$(echo -e $result_users)
+
+Teck tip: $teck
+EOF

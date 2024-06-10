@@ -1,0 +1,68 @@
+- name: Install bind9
+  ansible.builtin.apt:
+    update_cache: no
+    pkg:
+    - bind9 
+    - bind9utils 
+    - bind9-doc 
+    - bind9-host 
+    - dnsutils
+    - resolvconf
+  become: true
+
+- name: Add templated config file named
+  ansible.builtin.template:
+    src: ../files/named
+    dest: /etc/default/named
+    mode: '0755'
+  become: true
+  register: named_file
+
+- name: Add templated config file named.conf.options
+  ansible.builtin.template:
+    src: ../files/named.conf.options
+    dest: /etc/bind/named.conf.options
+    mode: '0755'
+  become: true
+  register: named_conf_options_file
+
+- name: Create bind9.service.d systemd directory
+  ansible.builtin.file:
+    path: '/etc/systemd/system/bind9.service.d'
+    state: directory
+    mode: '0755'
+  become: true
+
+- name: Add templated config file restart.conf
+  ansible.builtin.template:
+    src: ../files/restart.conf
+    dest: /etc/systemd/system/bind9.service.d/restart.conf
+    mode: '0755'
+  become: true
+  register: restart_conf_file
+
+- name: Reload the systemd daemon
+  ansible.builtin.systemd_service:
+    daemon_reload: true
+  become: true
+  when: restart_conf_file.changed
+
+- name: Enable bind9 systemd service
+  ansible.builtin.systemd:
+    name: bind9.service
+    state: restarted
+    scope: system
+    enabled: true
+  become: true
+  when: >
+    named_file.changed or
+    named_conf_options_file.changed or
+    restart_conf_file.changed
+
+- name: Enable named-resolvconf systemd service
+  ansible.builtin.systemd:
+    name: named-resolvconf.service
+    state: started
+    scope: system
+    enabled: true
+  become: true

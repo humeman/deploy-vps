@@ -8,9 +8,18 @@
   become: true
   register: sshd_conf
 
-- name: Restart sshd service
+- name: Add templated config file /etc/ssh/sshd_banner
+  ansible.builtin.template:
+    src: ../files/banner
+    dest: /etc/ssh/sshd_banner
+    owner: root
+    group: root
+    mode: '0755'
+  become: true
+
+- name: Restart ssh service
   ansible.builtin.systemd:
-    name: sshd
+    name: ssh
     state: reloaded
   become: true
   when: sshd_conf.changed

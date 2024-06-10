@@ -1,0 +1,3 @@
+{% for item in mail["dkim_hosts"] %}
+default._domainkey.{{ item }}     {{ item }}:default:/etc/opendkim/keys/{{ item }}/default.private
+{% endfor %}

@@ -1,0 +1,154 @@
+- name: Add dovecot to the 'mail' group
+  ansible.builtin.user:
+    name: dovecot
+    groups: mail
+    append: yes
+  become: true
+
+- name: Add templated config file dovecot.conf
+  ansible.builtin.template:
+    src: ../files/dovecot/dovecot.conf
+    dest: /etc/dovecot/dovecot.conf
+    owner: root
+    group: dovecot
+    mode: '0744'
+  become: true
+  register: dovecot_conf_file
+
+- name: Add templated config file dovecot-sql.conf.ext
+  ansible.builtin.template:
+    src: ../files/dovecot/dovecot-sql.conf.ext
+    dest: /etc/dovecot/dovecot-sql.conf.ext
+    owner: root
+    group: dovecot
+    mode: '0740'
+  become: true
+  register: dovecot_sql_conf_file
+
+- name: Add templated config file 10-auth.conf
+  ansible.builtin.template:
+    src: ../files/dovecot/10-auth.conf
+    dest: /etc/dovecot/conf.d/10-auth.conf
+    owner: root
+    group: dovecot
+    mode: '0744'
+  become: true
+  register: auth_conf_file
+
+- name: Add templated config file 10-mail.conf
+  ansible.builtin.template:
+    src: ../files/dovecot/10-mail.conf
+    dest: /etc/dovecot/conf.d/10-mail.conf
+    owner: root
+    group: dovecot
+    mode: '0744'
+  become: true
+  register: mail_conf_file
+
+- name: Add templated config file 10-master.conf
+  ansible.builtin.template:
+    src: ../files/dovecot/10-master.conf
+    dest: /etc/dovecot/conf.d/10-master.conf
+    owner: root
+    group: dovecot
+    mode: '0744'
+  become: true
+  register: master_conf_file
+
+- name: Add templated config file 10-ssl.conf
+  ansible.builtin.template:
+    src: ../files/dovecot/10-ssl.conf
+    dest: /etc/dovecot/conf.d/10-ssl.conf
+    owner: root
+    group: dovecot
+    mode: '0744'
+  become: true
+  register: ssl_conf_file
+
+- name: Add templated config file 15-mailboxes.conf
+  ansible.builtin.template:
+    src: ../files/dovecot/15-mailboxes.conf
+    dest: /etc/dovecot/conf.d/15-mailboxes.conf
+    owner: root
+    group: dovecot
+    mode: '0744'
+  become: true
+  register: mailboxes_conf_file
+
+- name: Add templated config file 15-lda.conf
+  ansible.builtin.template:
+    src: ../files/dovecot/15-lda.conf
+    dest: /etc/dovecot/conf.d/15-lda.conf
+    owner: root
+    group: dovecot
+    mode: '0744'
+  become: true
+  register: lda_conf_file
+
+- name: Add templated config file 20-lmtp.conf
+  ansible.builtin.template:
+    src: ../files/dovecot/20-lmtp.conf
+    dest: /etc/dovecot/conf.d/20-lmtp.conf
+    owner: root
+    group: dovecot
+    mode: '0744'
+  become: true
+  register: lmtp_conf_file
+
+- name: Add templated config file 90-sieve.conf
+  ansible.builtin.template:
+    src: ../files/dovecot/90-sieve.conf
+    dest: /etc/dovecot/conf.d/90-sieve.conf
+    owner: root
+    group: dovecot
+    mode: '0744'
+  become: true
+  register: sieve_conf_file
+
+- name: Add templated config file SpamToJunk.sieve
+  ansible.builtin.template:
+    src: ../files/dovecot/SpamToJunk.sieve
+    dest: /var/mail/SpamToJunk.sieve
+    owner: root
+    group: dovecot
+    mode: '0744'
+  become: true
+  register: spam_to_junk_sieve_file
+
+- name: Compile SpamToJunk sieve
+  ansible.builtin.command: "sievec /var/mail/SpamToJunk.sieve"
+  when: spam_to_junk_sieve_file.changed
+  become: true
+
+- name: Add www-data to the 'dovecot' group
+  ansible.builtin.user:
+    name: www-data
+    groups: dovecot
+    append: yes
+  register: www_data_group
+  become: true
+
+- name: Set acl for PostfixAdmin stats
+  ansible.builtin.command: "setfacl -R -m u:www-data:rwx /var/run/dovecot/stats-reader /var/run/dovecot/stats-writer"
+  when: www_data_group.changed
+  become: true
+
+- name: Restart dovecot
+  ansible.builtin.systemd:
+    name: dovecot.service
+    state: restarted
+    scope: system
+    enabled: true
+  become: true
+  when: >
+    dovecot_conf_file.changed or 
+    dovecot_sql_conf_file.changed or
+    auth_conf_file.changed or
+    mail_conf_file.changed or
+    master_conf_file.changed or
+    ssl_conf_file.changed or
+    mailboxes_conf_file.changed or
+    lda_conf_file.changed or
+    lmtp_conf_file.changed or
+    sieve_conf_file.changed or
+    spam_to_junk_sieve_file.changed

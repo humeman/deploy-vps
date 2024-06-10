@@ -1,0 +1,43 @@
+- name: Add templated config file opendmarc.conf
+  ansible.builtin.template:
+    src: ../files/opendmarc/opendmarc.conf
+    dest: /etc/opendmarc.conf
+    mode: '0744'
+  become: true
+  register: opendmarc_conf_file
+
+- name: Add postfix to the 'opendmarc' group
+  ansible.builtin.user:
+    name: postfix
+    groups: opendmarc
+    append: yes
+  become: true
+
+- name: Create opendmarc spool directory
+  ansible.builtin.file:
+    path: '/var/spool/postfix/opendmarc'
+    state: directory
+    mode: '0750'
+    owner: opendmarc
+    group: opendmarc
+  become: true
+  register: opendmarc_folder
+
+- name: Restart opendmarc systemd service
+  ansible.builtin.systemd:
+    name: opendmarc.service
+    state: restarted
+    scope: system
+    enabled: true
+  become: true
+  when: >
+    opendmarc_conf_file.changed or
+    opendmarc_folder.changed
+
+- name: Enable opendmarc systemd service
+  ansible.builtin.systemd:
+    name: opendmarc.service
+    state: started
+    scope: system
+    enabled: true
+  become: true

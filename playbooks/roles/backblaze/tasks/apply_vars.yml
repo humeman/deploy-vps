@@ -1,0 +1,22 @@
+- set_fact:
+    flag_backups: []
+
+- name: "Enable MySQL backups"
+  set_fact:
+    flag_backups: "{{ flag_backups + ['/var/lib/mysql'] }}"
+  when: flags[env]["mysql"]
+
+- name: "Enable MongoDB backups"
+  set_fact:
+    flag_backups: "{{ flag_backups + ['/var/lib/mongodb'] }}"
+  when: flags[env]["mongodb"]
+
+- name: "Enable Pterodactyl Panel backups"
+  set_fact:
+    flag_backups: "{{ flag_backups + ['/var/www/pterodactyl'] }}"
+  when: flags[env]["pterodactyl"]
+
+- name: "Enable Wings backups"
+  set_fact:
+    flag_backups: "{{ flag_backups + ['/etc/pterodactyl/config.yml', '/var/lib/pterodactyl/volumes', '/var/lib/pterodactyl/wings.db', '/var/lib/pterodactyl/states.json'] }}"
+  when: flags[env]["wings"]

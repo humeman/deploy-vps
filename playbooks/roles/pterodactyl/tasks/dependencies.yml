@@ -1,0 +1,50 @@
+- name: Install Pterodactyl dependencies (1)
+  ansible.builtin.apt:
+    update_cache: no
+    pkg:
+    - software-properties-common
+    - curl
+    - apt-transport-https
+    - ca-certificates
+    - gnupg
+  become: true
+
+- name: Execute templated script add-repositories-1.sh
+  ansible.builtin.command: /bin/bash /scripts/pterodactyl/add-repositories-1.sh 
+  become: true
+  when: pterodactyl_add_repositories_1_script.changed
+
+- name: Install Pterodactyl dependencies (2)
+  ansible.builtin.apt:
+    update_cache: no
+    pkg:
+    - php{{ dependency_versions[env]["php"] }}
+    - php{{ dependency_versions[env]["php"] }}-common
+    - php{{ dependency_versions[env]["php"] }}-cli
+    - php{{ dependency_versions[env]["php"] }}-gd
+    - php{{ dependency_versions[env]["php"] }}-mysql
+    - php{{ dependency_versions[env]["php"] }}-mbstring
+    - php{{ dependency_versions[env]["php"] }}-bcmath
+    - php{{ dependency_versions[env]["php"] }}-xml
+    - php{{ dependency_versions[env]["php"] }}-fpm
+    - php{{ dependency_versions[env]["php"] }}-curl
+    - php{{ dependency_versions[env]["php"] }}-zip 
+    - mariadb-server 
+    - tar 
+    - nginx
+    - unzip 
+    - git 
+    - redis-server
+  become: true
+
+- name: Execute templated script add-repositories-2.sh
+  ansible.builtin.command: /bin/bash /scripts/pterodactyl/add-repositories-2.sh 
+  become: true
+
+- name: Enable Redis
+  ansible.builtin.systemd:
+    name: redis-server.service
+    state: started
+    scope: system
+    enabled: true
+  become: true

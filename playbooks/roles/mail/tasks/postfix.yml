@@ -1,0 +1,237 @@
+- name: Add templated config file master.cf
+  ansible.builtin.template:
+    src: ../files/postfix/master.cf
+    dest: /etc/postfix/master.cf
+    owner: root
+    group: root
+    mode: '0744'
+  become: true
+  register: master_cf_file
+
+- name: Add templated config file main.cf
+  ansible.builtin.template:
+    src: ../files/postfix/main.cf
+    dest: /etc/postfix/main.cf
+    owner: root
+    group: root
+    mode: '0744'
+  become: true
+  register: main_cf_file
+
+- name: Create Postfix SQL config directory
+  ansible.builtin.file:
+    path: '/etc/postfix/sql'
+    state: directory
+    owner: postfix
+    group: postfix
+    mode: '0750'
+  become: true
+
+- name: Add templated config file mysql_virtual_alias_domain_catchall_maps.cf
+  ansible.builtin.template:
+    src: ../files/postfix/sql/mysql_virtual_alias_domain_catchall_maps.cf
+    dest: /etc/postfix/sql/mysql_virtual_alias_domain_catchall_maps.cf
+    owner: postfix
+    group: postfix
+    mode: '0640'
+  become: true
+  register: sql_1_file
+
+- name: Add templated config file mysql_virtual_alias_domain_mailbox_maps.cf
+  ansible.builtin.template:
+    src: ../files/postfix/sql/mysql_virtual_alias_domain_mailbox_maps.cf
+    dest: /etc/postfix/sql/mysql_virtual_alias_domain_mailbox_maps.cf
+    owner: postfix
+    group: postfix
+    mode: '0640'
+  become: true
+  register: sql_2_file
+
+- name: Add templated config file mysql_virtual_alias_domain_maps.cf
+  ansible.builtin.template:
+    src: ../files/postfix/sql/mysql_virtual_alias_domain_maps.cf
+    dest: /etc/postfix/sql/mysql_virtual_alias_domain_maps.cf
+    owner: postfix
+    group: postfix
+    mode: '0640'
+  become: true
+  register: sql_3_file
+
+- name: Add templated config file mysql_virtual_alias_maps.cf
+  ansible.builtin.template:
+    src: ../files/postfix/sql/mysql_virtual_alias_maps.cf
+    dest: /etc/postfix/sql/mysql_virtual_alias_maps.cf
+    owner: postfix
+    group: postfix
+    mode: '0640'
+  become: true
+  register: sql_4_file
+
+- name: Add templated config file mysql_virtual_domains_maps.cf
+  ansible.builtin.template:
+    src: ../files/postfix/sql/mysql_virtual_domains_maps.cf
+    dest: /etc/postfix/sql/mysql_virtual_domains_maps.cf
+    owner: postfix
+    group: postfix
+    mode: '0640'
+  become: true
+  register: sql_5_file
+
+- name: Add templated config file mysql_virtual_mailbox_maps.cf
+  ansible.builtin.template:
+    src: ../files/postfix/sql/mysql_virtual_mailbox_maps.cf
+    dest: /etc/postfix/sql/mysql_virtual_mailbox_maps.cf
+    owner: postfix
+    group: postfix
+    mode: '0640'
+  become: true
+  register: sql_6_file
+
+- name: Create vmail group
+  ansible.builtin.group:
+    name: vmail
+    state: present
+    gid: 2000
+  become: true
+
+- name: Create vmail user
+  ansible.builtin.user:
+    name: vmail
+    group: vmail
+    password: "*"
+    create_home: false
+    state: present
+    uid: 2000
+    system: true
+  become: true
+
+- name: Create mail directory
+  ansible.builtin.file:
+    path: '/var/vmail'
+    state: directory
+    mode: '0770'
+    owner: vmail
+    group: vmail
+  become: true
+
+- name: Install Postfix SPF/DKIM dependencies
+  ansible.builtin.apt:
+    update_cache: no
+    pkg:
+    - postfix-policyd-spf-python
+    - opendkim
+    - opendkim-tools
+  become: true
+
+- name: Add postfix to the 'opendkim' group
+  ansible.builtin.user:
+    name: postfix
+    groups: opendkim
+    append: yes
+  become: true
+
+- name: Add templated config file opendkim.conf
+  ansible.builtin.template:
+    src: ../files/opendkim/opendkim.conf
+    dest: /etc/opendkim.conf
+    mode: '0644'
+  become: true
+  register: opendkim_file
+
+- name: Create opendkim spool directory
+  ansible.builtin.file:
+    path: '/var/spool/postfix/opendkim'
+    state: directory
+    mode: '0770'
+    owner: opendkim
+    group: postfix
+  become: true
+
+- name: Create opendkim directory
+  ansible.builtin.file:
+    path: '/etc/opendkim'
+    state: directory
+    mode: '0700'
+    owner: opendkim
+    group: opendkim
+  become: true
+
+- name: Create opendkim/keys directory
+  ansible.builtin.file:
+    path: '/etc/opendkim/keys'
+    state: directory
+    mode: '0700'
+    owner: opendkim
+    group: opendkim
+  become: true
+
+- name: Add templated config file signing.table
+  ansible.builtin.template:
+    src: ../files/opendkim/signing.table
+    dest: /etc/opendkim/signing.table
+    mode: '0740'
+    owner: opendkim
+    group: opendkim
+  become: true
+  register: opendkim_signing_table_file
+
+- name: Add templated config file key.table
+  ansible.builtin.template:
+    src: ../files/opendkim/key.table
+    dest: /etc/opendkim/key.table
+    mode: '0740'
+    owner: opendkim
+    group: opendkim
+  become: true
+  register: opendkim_key_table_file
+
+- name: Add templated config file trusted.hosts
+  ansible.builtin.template:
+    src: ../files/opendkim/trusted.hosts
+    dest: /etc/opendkim/trusted.hosts
+    mode: '0740'
+    owner: opendkim
+    group: opendkim
+  become: true
+  register: opendkim_trusted_hosts_file
+
+- name: Add templated config file opendkim
+  ansible.builtin.template:
+    src: ../files/opendkim/opendkim
+    dest: /etc/default/opendkim
+  become: true
+  register: opendkim_legacy_file
+
+- name: Set up DKIM for configured hosts
+  include_tasks: opendkim.yml
+  loop: "{{ mail['dkim_hosts'] }}"
+
+- name: Restart Postfix
+  ansible.builtin.systemd:
+    name: postfix.service
+    state: restarted
+    scope: system
+    enabled: true
+  become: true
+  when: >
+    master_cf_file.changed or
+    main_cf_file.changed or
+    sql_1_file.changed or
+    sql_2_file.changed or
+    sql_3_file.changed or
+    sql_4_file.changed or
+    sql_5_file.changed or
+    sql_6_file.changed
+
+- name: Restart OpenDKIM
+  ansible.builtin.systemd:
+    name: opendkim.service
+    state: restarted
+    scope: system
+    enabled: true
+  become: true
+  when: >
+    opendkim_signing_table_file.changed or
+    opendkim_key_table_file.changed or
+    opendkim_trusted_hosts_file.changed or
+    opendkim_legacy_file.changed

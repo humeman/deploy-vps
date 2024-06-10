@@ -1,6 +1,6 @@
 - name: Install general dependencies
   ansible.builtin.apt:
-    update_cache: yes
+    update_cache: no
     pkg:
     - vim
     - tmux

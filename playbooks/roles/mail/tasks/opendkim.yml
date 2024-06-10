@@ -1,0 +1,28 @@
+- name: Create DKIM key directory for {{ item }}
+  ansible.builtin.file:
+    path: '/etc/opendkim/keys/{{ item }}'
+    state: directory
+    mode: '0700'
+    owner: opendkim
+    group: opendkim
+  become: true
+
+- name: Stat DKIM key for {{ item }}
+  ansible.builtin.stat: 
+    path: /etc/opendkim/keys/{{ item }}/default.private
+  become: true
+  register: dkim_key_file
+
+- name: Generate OpenDKIM key
+  ansible.builtin.shell: >-
+    opendkim-genkey -b 2048 -d '{{ item }}' -D '/etc/opendkim/keys/{{ item }}' -s default -v
+  when: not dkim_key_file.stat.exists
+  become: true
+
+- name: Set permissions of DKIM key for {{ item }}
+  ansible.builtin.file:
+    path: '/etc/opendkim/keys/{{ item }}/default.private'
+    mode: '0600'
+    owner: opendkim
+    group: opendkim
+  become: true

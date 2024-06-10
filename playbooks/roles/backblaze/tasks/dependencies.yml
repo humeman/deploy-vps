@@ -1,6 +1,6 @@
 - name: Install Duplicity
   ansible.builtin.apt:
-    update_cache: yes
+    update_cache: no
     pkg:
     - duplicity
     - python3-b2sdk

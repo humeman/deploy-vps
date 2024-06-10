@@ -1,6 +1,6 @@
 - name: Install UFW
   ansible.builtin.apt:
-    update_cache: yes
+    update_cache: no
     pkg:
     - ufw
   become: true

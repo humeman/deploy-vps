@@ -1,0 +1,55 @@
+- name: Add templated config file spamassassin
+  ansible.builtin.template:
+    src: ../files/spamassassin/spamassassin
+    dest: /etc/default/spamassassin
+    owner: root
+    group: root
+    mode: '0744'
+  become: true
+  register: spamassassin_file
+
+- name: Add templated config file spamass-milter
+  ansible.builtin.template:
+    src: ../files/spamassassin/spamass-milter
+    dest: /etc/default/spamass-milter
+    owner: root
+    group: root
+    mode: '0744'
+  become: true
+  register: spamass_milter_file
+
+- name: Restart spamassassin systemd service
+  ansible.builtin.systemd:
+    name: "{{ 'spamd' if version_name == 'noble' else 'spamassassin' }}.service"
+    state: restarted
+    scope: system
+    enabled: true
+  become: true
+  when: >
+    spamassassin_file.changed
+
+- name: Enable spamassassin systemd service
+  ansible.builtin.systemd:
+    name: "{{ 'spamd' if version_name == 'noble' else 'spamassassin' }}.service"
+    state: started
+    scope: system
+    enabled: true
+  become: true
+
+- name: Restart spamass-milter systemd service
+  ansible.builtin.systemd:
+    name: spamass-milter.service
+    state: restarted
+    scope: system
+    enabled: true
+  become: true
+  when: >
+    spamass_milter_file.changed
+
+- name: Enable spamass-milter systemd service
+  ansible.builtin.systemd:
+    name: spamass-milter.service
+    state: started
+    scope: system
+    enabled: true
+  become: true
