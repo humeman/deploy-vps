@@ -16,7 +16,7 @@ flags:
     mail: false
   prod:
     setup: true
-    users: false
+    users: true
     ssh: true
     fail2ban: true
     alerting: false
