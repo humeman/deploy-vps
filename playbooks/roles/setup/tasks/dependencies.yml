@@ -6,4 +6,5 @@
     - tmux
     - git
     - python3
+    - sl
   become: true
