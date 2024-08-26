@@ -1,7 +1,7 @@
 flags:
   dev:
     setup: true
-    users: false
+    users: true
     ssh: true
     fail2ban: false
     alerting: false
