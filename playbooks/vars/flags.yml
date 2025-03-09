@@ -1,8 +1,8 @@
 flags:
   dev:
-    setup: true
+    setup: false
     users: true
-    ssh: true
+    ssh: false
     fail2ban: false
     alerting: false
     backblaze: false
@@ -15,10 +15,10 @@ flags:
     bind9: false
     mail: true
   prod:
-    setup: true
+    setup: false
     users: true
-    ssh: true
-    fail2ban: true
+    ssh: false
+    fail2ban: false
     alerting: false
     backblaze: false
     mysql: false
