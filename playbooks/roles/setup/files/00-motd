@@ -13,8 +13,13 @@ is_private_ip() {
     fi
 }
 
+<<<<<<< HEAD
 teck=$(wget -q -O- https://tecktip.today:8325)
 if [ $? -ne 0 ]; then
+=======
+teck=$(curl "https://tecktip.today:8325")
+if [ $result -ne 0 ]; then
+>>>>>>> 0cb88be6bcebab50e9be03547785de095f7359f8
     teck="There is no teck, and there is no tip... (request failed)"
 fi
 
