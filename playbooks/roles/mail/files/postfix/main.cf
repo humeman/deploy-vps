@@ -81,11 +81,11 @@ smtpd_recipient_restrictions =
    reject_unauth_destination,
    reject_unknown_reverse_client_hostname,
    check_policy_service unix:private/policyd-spf,
-   reject_rhsbl_helo dbl.spamhaus.org,
-   reject_rhsbl_reverse_client dbl.spamhaus.org,
-   reject_rhsbl_sender dbl.spamhaus.org,
+   reject_rhsbl_helo {{ mail["dbl"] }},
+   reject_rhsbl_reverse_client {{ mail["dbl"] }},
+   reject_rhsbl_sender {{ mail["dbl"] }},
    permit_dnswl_client list.dnswl.org=127.0.[0..255].[1..3],
-   reject_rbl_client zen.spamhaus.org
+   reject_rbl_client {{ mail["zen"] }}
 
 smtpd_sender_restrictions =
    permit_mynetworks

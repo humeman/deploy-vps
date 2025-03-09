@@ -1,7 +1,7 @@
 flags:
   dev:
     setup: true
-    users: false
+    users: true
     ssh: true
     fail2ban: false
     alerting: false
@@ -13,7 +13,7 @@ flags:
     wings: false
     mongodb: false
     bind9: false
-    mail: false
+    mail: true
   prod:
     setup: true
     users: true
@@ -28,4 +28,4 @@ flags:
     wings: false
     mongodb: false
     bind9: false
-    mail: false
+    mail: true

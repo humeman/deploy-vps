@@ -13,8 +13,8 @@ is_private_ip() {
     fi
 }
 
-wget -U "$USER_AGENT" -q -O- https://tecktip.today:8325 >"$teck" || result=$?
-if [ $result -ne 0 ]; then
+teck=$(wget -q -O- https://tecktip.today:8325)
+if [ $? -ne 0 ]; then
     teck="There is no teck, and there is no tip... (request failed)"
 fi
 
