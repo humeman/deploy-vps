@@ -3,7 +3,7 @@
   tasks:
     - name: Parse 'only_deploy' (-e only_deploy=...) list
       set_fact: 
-        only_deploy: "{{ only_deploy | split(',') }}"
+        only_deploy_list: "{{ only_deploy | split(',') }}"
       when: only_deploy is defined
     - name: Update apt cache
       ansible.builtin.apt:
@@ -29,64 +29,64 @@
     - name: Primary node setup
       include_role:
         name: setup
-      when: flags['setup'] and (dep_list is not defined or dep_list['setup'])
+      when: flags['setup'] and (only_deploy_list is not defined or 'setup' in only_deploy_list)
     - name: Users
       include_role:
         name: users
-      when: flags['users'] and (dep_list is not defined or dep_list['users'])
+      when: flags['users'] and (only_deploy_list is not defined or 'users' in only_deploy_list)
     - name: SSH
       include_role:
         name: ssh
-      when: flags['ssh'] and (dep_list is not defined or dep_list['ssh'])
+      when: flags['ssh'] and (only_deploy_list is not defined or 'ssh' in only_deploy_list)
     - name: Fail2ban
       include_role:
         name: fail2ban
-      when: flags['fail2ban'] and (dep_list is not defined or dep_list['fail2ban'])
+      when: flags['fail2ban'] and (only_deploy_list is not defined or 'fail2ban' in only_deploy_list)
     - name: Alerting
       include_role:
         name: alerting
-      when: flags['alerting'] and (dep_list is not defined or dep_list['alerting'])
+      when: flags['alerting'] and (only_deploy_list is not defined or 'alerting' in only_deploy_list)
     - name: Backblaze B2 backups
       include_role:
         name: backblaze
-      when: flags['backblaze'] and (dep_list is not defined or dep_list['backblaze'])
+      when: flags['backblaze'] and (only_deploy_list is not defined or 'backblaze' in only_deploy_list)
     - name: MySQL
       include_role:
         name: mysql
-      when: flags['mysql'] and (dep_list is not defined or dep_list['mysql'])
+      when: flags['mysql'] and (only_deploy_list is not defined or 'mysql' in only_deploy_list)
     - name: Nginx
       include_role:
         name: nginx
-      when: flags['nginx'] and (dep_list is not defined or dep_list['nginx'])
+      when: flags['nginx'] and (only_deploy_list is not defined or 'nginx' in only_deploy_list)
     - name: Docker
       include_role:
         name: docker
-      when: flags['docker'] and (dep_list is not defined or dep_list['docker'])
+      when: flags['docker'] and (only_deploy_list is not defined or 'docker' in only_deploy_list)
     - name: Pterodactyl
       include_role:
         name: pterodactyl
-      when: flags['docker'] and flags['pterodactyl'] and (dep_list is not defined or dep_list['pterodactyl'])
+      when: flags['docker'] and flags['pterodactyl'] and (only_deploy_list is not defined or 'pterodactyl' in only_deploy_list)
     - name: Wings
       include_role:
         name: wings
-      when: flags['docker'] and flags['wings'] and (dep_list is not defined or dep_list['wings'])
+      when: flags['docker'] and flags['wings'] and (only_deploy_list is not defined or 'wings' in only_deploy_list)
     - name: MongoDB
       include_role:
         name: mongodb
-      when: flags['mongodb'] and (dep_list is not defined or dep_list['mongodb'])
+      when: flags['mongodb'] and (only_deploy_list is not defined or 'mongodb' in only_deploy_list)
     - name: Bind9
       include_role:
         name: bind9
-      when: flags['bind9'] and (dep_list is not defined or dep_list['bind9'])
+      when: flags['bind9'] and (only_deploy_list is not defined or 'bind9' in only_deploy_list)
     - name: Mail
       include_role:
         name: mail
-      when: flags['mail'] and (dep_list is not defined or dep_list['mail'])
+      when: flags['mail'] and (only_deploy_list is not defined or 'mail' in only_deploy_list)
     - name: Logwatch
       include_role:
         name: logwatch
-      when: flags['logwatch'] and (dep_list is not defined or dep_list['logwatch'])
+      when: flags['logwatch'] and (only_deploy_list is not defined or 'logwatch' in only_deploy_list)
     - name: CrowdSec
       include_role:
         name: crowdsec
-      when: flags['crowdsec'] and (dep_list is not defined or dep_list['crowdsec'])
+      when: flags['crowdsec'] and (only_deploy_list is not defined or 'crowdsec' in only_deploy_list)
