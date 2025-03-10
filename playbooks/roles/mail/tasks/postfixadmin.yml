@@ -7,7 +7,7 @@
 
 - name: Download PostfixAdmin
   ansible.builtin.get_url:
-    url: "{{ mail['postfixadmin']['download_url'] }}"
+    url: "{{ mail['postfixadmin']['download'] }}"
     dest: '/var/www/postfixadmin/postfixadmin.tar.gz'
     mode: '0700'
   register: postfixadmin_download

@@ -51,3 +51,4 @@ if [ $? -ne 0 ]; then
     let "count=count+1"
 
     . /scripts/notifier/notify.sh $1 1 ${count}
+fi
