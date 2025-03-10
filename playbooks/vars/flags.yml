@@ -1,21 +1,4 @@
 flags:
-  dev:
-    setup: false
-    users: false
-    ssh: false
-    fail2ban: false
-    alerting: false
-    backblaze: false
-    mysql: false
-    nginx: false
-    docker: false
-    pterodactyl: false
-    wings: false
-    mongodb: false
-    bind9: false
-    mail: false
-    logwatch: false
-    crowdsec: true
   prod:
     setup: false
     users: true

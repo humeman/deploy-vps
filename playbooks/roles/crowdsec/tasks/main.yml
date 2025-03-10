@@ -31,3 +31,27 @@
   when: console_status.rc == 1
   notify:
     - Restart CrowdSec
+
+- name: Check if Dovecot collection is enabled
+  ansible.builtin.shell: cscli collections list -o raw | grep dovecot
+  become: true
+  register: dovecot_status
+  failed_when: dovecot_status.rc > 1
+  when: flags["mail"]
+
+- name: Install Dovecot collection
+  ansible.builtin.shell: cscli collections install crowdsecurity/dovecot
+  become: true
+  when: flags["mail"] and dovecot_status.rc == 1
+
+- name: Check if Postfix collection is enabled
+  ansible.builtin.shell: cscli collections list -o raw | grep postfix
+  become: true
+  register: postfix_status
+  failed_when: postfix_status.rc > 1
+  when: flags["mail"]
+
+- name: Install Postfix collection
+  ansible.builtin.shell: cscli collections install crowdsecurity/postfix
+  become: true
+  when: flags["mail"] and postfix_status.rc == 1
