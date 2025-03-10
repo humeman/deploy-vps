@@ -1,4 +1,3 @@
-#!/bin/bash
 # Params:
 #  service [delay] [count]
 # service: systemd service to alert on
@@ -13,7 +12,7 @@ if [ $# -eq 0 ]; then
     exit 1
 fi
 
-count=0
+count=1
 if [ -n "${3}" ]; then
     count=$3
     echo "Attempt: $3"
@@ -25,31 +24,24 @@ if [ -n "${2}" ]; then
     fi
 fi
 
+service_status=$(systemctl -l status $1 --no-pager | tail -n 50 | jq -Rsa . | cut -d '"' -f 2)
+
 read -rd '' json <<EOF
-payload_json={
-    "embeds": [
-        {
-            "title": "Systemd node alert: $(hostname -f), $1",
-            "description": "Systemd service \`$1\` has failed. See attached logs for more.",
-            "color": 12869919,
-            "footer": {
-                "text": "Retry #: ${count}/${MAX_RETRIES}"
-            }
-        }
-    ]
+{
+    "topic": "{{ alerting["ntfy_topic"] }}",
+    "title": "Service: $1",
+    "message": "Service \`$1\` has failed.\n\`\`\`$service_status\`\`\`",
+    "tags": ["rotating_light"],
+    "priority": 4,
+    "markdown": true
 }
 EOF
 
-systemctl -l status $1 --no-pager > /tmp/discord_notifier_log.txt
-
-curl -X POST {{ discord_webhook_url }} \
-    -F "file=@/tmp/discord_notifier_log.txt" \
-    -F "$json"
-
-rm /tmp/discord_notifier_log.txt
+curl ntfy.sh \
+    -d "$json"
 
 if [ $? -ne 0 ]; then
-    echo "ERROR: Failed to post to Discord."
+    echo "ERROR: Failed to post to ntfy."
 
     if [ ${count} -ge ${MAX_RETRIES} ]; then
         echo "Process failed after ${count} retries. Exiting."
@@ -59,5 +51,3 @@ if [ $? -ne 0 ]; then
     let "count=count+1"
 
     . /scripts/notifier/notify.sh $1 1 ${count}
-
-fi
