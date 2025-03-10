@@ -1,0 +1,57 @@
+- name: Test for CrowdSec repository
+  stat:
+    path: /etc/apt/sources.list.d/crowdsec_crowdsec.list
+  become: true
+  register: crowdsec_repo
+
+- name: Add CrowdSec repository
+  ansible.builtin.shell: curl -s https://install.crowdsec.net | sh
+  become: true
+  when: not crowdsec_repo.stat.exists
+
+- name: Install CrowdSec and IPTables bouncer
+  ansible.builtin.apt:
+    update_cache: no
+    pkg:
+    - crowdsec
+    - crowdsec-firewall-bouncer-iptables
+  become: true
+  notify:
+    - Restart CrowdSec
+
+- name: Check if CrowdSec console is enrolled
+  ansible.builtin.shell: cscli console status -o raw | grep context,true
+  become: true
+  register: console_status
+  failed_when: console_status.rc > 1
+
+- name: Enroll to CrowdSec console
+  ansible.builtin.shell: cscli console enroll -e context {{ crowdsec["console_key"] }} -n {{ hostname }}
+  become: true
+  when: console_status.rc == 1
+  notify:
+    - Restart CrowdSec
+
+- name: Check if Dovecot collection is enabled
+  ansible.builtin.shell: cscli collections list -o raw | grep dovecot
+  become: true
+  register: dovecot_status
+  failed_when: dovecot_status.rc > 1
+  when: flags["mail"]
+
+- name: Install Dovecot collection
+  ansible.builtin.shell: cscli collections install crowdsecurity/dovecot
+  become: true
+  when: flags["mail"] and dovecot_status.rc == 1
+
+- name: Check if Postfix collection is enabled
+  ansible.builtin.shell: cscli collections list -o raw | grep postfix
+  become: true
+  register: postfix_status
+  failed_when: postfix_status.rc > 1
+  when: flags["mail"]
+
+- name: Install Postfix collection
+  ansible.builtin.shell: cscli collections install crowdsecurity/postfix
+  become: true
+  when: flags["mail"] and postfix_status.rc == 1

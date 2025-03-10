@@ -11,6 +11,7 @@ echo "-- Checking playbook on environment $1 --"
 ansible-playbook \
     -i ".data/inventory" \
     -e @.data/vault \
+    ${ONLY_DEPLOY:+-e "only_deploy=$ONLY_DEPLOY"} \
     --vault-password-file ".data/vault_k" \
     --private-key ".data/id_rsa" \
     --check \

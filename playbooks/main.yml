@@ -1,9 +1,10 @@
 - hosts: all
   remote_user: root
-  vars_files:
-    - vars/flags.yml
-    - vars/dependency_versions.yml
   tasks:
+    - name: Parse 'only_deploy' (-e only_deploy=...) list
+      set_fact: 
+        only_deploy_list: "{{ only_deploy | split(',') }}"
+      when: only_deploy is defined
     - name: Update apt cache
       ansible.builtin.apt:
         update_cache: yes
@@ -28,56 +29,64 @@
     - name: Primary node setup
       include_role:
         name: setup
-      when: flags[env]['setup']
+      when: flags['setup'] and (only_deploy_list is not defined or 'setup' in only_deploy_list)
     - name: Users
       include_role:
         name: users
-      when: flags[env]['users']
+      when: flags['users'] and (only_deploy_list is not defined or 'users' in only_deploy_list)
     - name: SSH
       include_role:
         name: ssh
-      when: flags[env]['ssh']
+      when: flags['ssh'] and (only_deploy_list is not defined or 'ssh' in only_deploy_list)
     - name: Fail2ban
       include_role:
         name: fail2ban
-      when: flags[env]['fail2ban']
+      when: flags['fail2ban'] and (only_deploy_list is not defined or 'fail2ban' in only_deploy_list)
     - name: Alerting
       include_role:
         name: alerting
-      when: flags[env]['alerting']
+      when: flags['alerting'] and (only_deploy_list is not defined or 'alerting' in only_deploy_list)
     - name: Backblaze B2 backups
       include_role:
         name: backblaze
-      when: flags[env]['backblaze']
+      when: flags['backblaze'] and (only_deploy_list is not defined or 'backblaze' in only_deploy_list)
     - name: MySQL
       include_role:
         name: mysql
-      when: flags[env]['mysql']
+      when: flags['mysql'] and (only_deploy_list is not defined or 'mysql' in only_deploy_list)
     - name: Nginx
       include_role:
         name: nginx
-      when: flags[env]['nginx']
+      when: flags['nginx'] and (only_deploy_list is not defined or 'nginx' in only_deploy_list)
     - name: Docker
       include_role:
         name: docker
-      when: flags[env]['docker']
+      when: flags['docker'] and (only_deploy_list is not defined or 'docker' in only_deploy_list)
     - name: Pterodactyl
       include_role:
         name: pterodactyl
-      when: flags[env]['docker'] and flags[env]['pterodactyl']
+      when: flags['docker'] and flags['pterodactyl'] and (only_deploy_list is not defined or 'pterodactyl' in only_deploy_list)
     - name: Wings
       include_role:
         name: wings
-      when: flags[env]['docker'] and flags[env]['wings']
+      when: flags['docker'] and flags['wings'] and (only_deploy_list is not defined or 'wings' in only_deploy_list)
     - name: MongoDB
       include_role:
         name: mongodb
-      when: flags[env]['mongodb']
+      when: flags['mongodb'] and (only_deploy_list is not defined or 'mongodb' in only_deploy_list)
     - name: Bind9
       include_role:
         name: bind9
-      when: flags[env]['bind9']
+      when: flags['bind9'] and (only_deploy_list is not defined or 'bind9' in only_deploy_list)
     - name: Mail
       include_role:
         name: mail
-      when: flags[env]['mail']
+      when: flags['mail'] and (only_deploy_list is not defined or 'mail' in only_deploy_list)
+    - name: Logwatch
+      include_role:
+        name: logwatch
+      when: flags['logwatch'] and (only_deploy_list is not defined or 'logwatch' in only_deploy_list)
+    - name: CrowdSec
+      include_role:
+        name: crowdsec
+      when: flags['crowdsec'] and (only_deploy_list is not defined or 'crowdsec' in only_deploy_list)

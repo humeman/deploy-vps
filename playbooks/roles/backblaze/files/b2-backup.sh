@@ -6,7 +6,7 @@ set -e
 duplicity \
     remove-older-than 8D --force \
     --no-encryption \
-    b2://{{ b2_account }}:{{ b2_key }}@{{ b2_bucket }}/backups
+    b2://{{ b2["account"] }}:{{ b2["key"] }}@{{ b2["bucket"] }}/backups
 
 # Perform the backup, make a full backup if it's been over 7 days
 duplicity \
@@ -20,15 +20,15 @@ duplicity \
 {% endfor %}
     --exclude '**' \
     --no-encryption \
-    / b2://{{ b2_account }}:{{ b2_key }}@{{ b2_bucket }}/backups
+    / b2://{{ b2["account"] }}:{{ b2["key"] }}@{{ b2["bucket"] }}/backups
 
 # Cleanup failures
 duplicity \
     cleanup --force \
     --no-encryption \
-    b2://{{ b2_account }}:{{ b2_key }}@{{ b2_bucket }}/backups
+    b2://{{ b2["account"] }}:{{ b2["key"] }}@{{ b2["bucket"] }}/backups
 
 # Show collection-status
 duplicity collection-status \
     --no-encryption \
-    b2://{{ b2_account }}:{{ b2_key }}@{{ b2_bucket }}/backups
+    b2://{{ b2["account"] }}:{{ b2["key"] }}@{{ b2["bucket"] }}/backups
