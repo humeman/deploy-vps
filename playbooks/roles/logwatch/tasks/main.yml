@@ -1,0 +1,22 @@
+- name: Install logwatch
+  ansible.builtin.apt:
+    update_cache: no
+    pkg:
+    - logwatch
+  become: true
+
+- name: Create logwatch cache directory
+  ansible.builtin.file:
+    path: /var/cache/logwatch
+    state: directory
+    mode: '0700'
+  become: true
+
+- name: Update logwatch config file
+  ansible.builtin.template:
+    src: ../files/logwatch.conf
+    dest: /etc/logwatch/conf/logwatch.conf
+    owner: root
+    group: root
+    mode: '0644'
+  become: true

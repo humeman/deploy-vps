@@ -1,0 +1,33 @@
+- name: Test for CrowdSec repository
+  stat:
+    path: /etc/apt/sources.list.d/crowdsec_crowdsec.list
+  become: true
+  register: crowdsec_repo
+
+- name: Add CrowdSec repository
+  ansible.builtin.shell: curl -s https://install.crowdsec.net | sh
+  become: true
+  when: not crowdsec_repo.stat.exists
+
+- name: Install CrowdSec and IPTables bouncer
+  ansible.builtin.apt:
+    update_cache: no
+    pkg:
+    - crowdsec
+    - crowdsec-firewall-bouncer-iptables
+  become: true
+  notify:
+    - Restart CrowdSec
+
+- name: Check if CrowdSec console is enrolled
+  ansible.builtin.shell: cscli console status -o raw | grep context,true
+  become: true
+  register: console_status
+  failed_when: console_status.rc > 1
+
+- name: Enroll to CrowdSec console
+  ansible.builtin.shell: cscli console enroll -e context {{ crowdsec["console_key"] }} -n {{ hostname }}
+  become: true
+  when: console_status.rc == 1
+  notify:
+    - Restart CrowdSec

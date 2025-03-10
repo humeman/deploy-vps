@@ -81,3 +81,11 @@
       include_role:
         name: mail
       when: flags[env]['mail']
+    - name: Logwatch
+      include_role:
+        name: logwatch
+      when: flags[env]['logwatch']
+    - name: CrowdSec
+      include_role:
+        name: crowdsec
+      when: flags[env]['crowdsec']
