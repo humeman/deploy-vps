@@ -17,18 +17,18 @@
     - dovecot-mysql
     - dovecot-sieve
     - opendmarc
-    - php{{ dependency_versions[env]["php"] }}
-    - php{{ dependency_versions[env]["php"] }}-fpm
-    - php{{ dependency_versions[env]["php"] }}-imap
-    - php{{ dependency_versions[env]["php"] }}-mbstring
-    - php{{ dependency_versions[env]["php"] }}-mysql
-    - php{{ dependency_versions[env]["php"] }}-curl
-    - php{{ dependency_versions[env]["php"] }}-zip
-    - php{{ dependency_versions[env]["php"] }}-xml
-    - php{{ dependency_versions[env]["php"] }}-bz2
-    - php{{ dependency_versions[env]["php"] }}-intl
-    - php{{ dependency_versions[env]["php"] }}-gmp
-    - php{{ dependency_versions[env]["php"] }}-redis
+    - php{{ dependency_versions["php"] }}
+    - php{{ dependency_versions["php"] }}-fpm
+    - php{{ dependency_versions["php"] }}-imap
+    - php{{ dependency_versions["php"] }}-mbstring
+    - php{{ dependency_versions["php"] }}-mysql
+    - php{{ dependency_versions["php"] }}-curl
+    - php{{ dependency_versions["php"] }}-zip
+    - php{{ dependency_versions["php"] }}-xml
+    - php{{ dependency_versions["php"] }}-bz2
+    - php{{ dependency_versions["php"] }}-intl
+    - php{{ dependency_versions["php"] }}-gmp
+    - php{{ dependency_versions["php"] }}-redis
     - acl
     - spamassassin 
     - spamc

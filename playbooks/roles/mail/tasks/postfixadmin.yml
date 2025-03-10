@@ -7,7 +7,7 @@
 
 - name: Download PostfixAdmin
   ansible.builtin.get_url:
-    url: "{{ downloads[env]['postfixadmin'] }}"
+    url: "{{ mail['postfixadmin']['download_url'] }}"
     dest: '/var/www/postfixadmin/postfixadmin.tar.gz'
     mode: '0700'
   register: postfixadmin_download
@@ -23,12 +23,12 @@
   become: true
 
 - name: Move PostfixAdmin files into webroot
-  ansible.builtin.shell: "mv /var/www/postfixadmin/postfixadmin-postfixadmin-{{ dependency_versions[env]['postfixadmin'] }}/* /var/www/postfixadmin"
+  ansible.builtin.shell: "mv /var/www/postfixadmin/postfixadmin-postfixadmin-{{ mail['postfixadmin']['version'] }}/* /var/www/postfixadmin"
   when: postfixadmin_download.changed
   become: true
 
 - name: Remove PostfixAdmin extract
-  ansible.builtin.command: "rm -r /var/www/postfixadmin/postfixadmin-postfixadmin-{{ dependency_versions[env]['postfixadmin'] }}"
+  ansible.builtin.command: "rm -r /var/www/postfixadmin/postfixadmin-postfixadmin-{{ mail['postfixadmin']['version'] }}"
   when: postfixadmin_download.changed
   become: true
 

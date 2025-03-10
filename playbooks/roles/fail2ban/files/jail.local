@@ -36,7 +36,7 @@ banaction = %(banaction_allports)s
 logpath  = %(syslog_authpriv)s
 backend  = %(syslog_backend)s
 
-{% if flags[env]["mail"] %}
+{% if flags["mail"] %}
 [postfix-flood-attack]
 enabled  = true
 bantime  = 10m
