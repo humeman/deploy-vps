@@ -50,25 +50,41 @@
   when: postfixadmin_templates.changed
   become: true
 
-- name: Execute templated script postfixadmin-mysql.sh
-  ansible.builtin.command: /bin/bash /scripts/mail/postfixadmin-mysql.sh 
+- name: Create PostfixAdmin SQL database
+  community.mysql.mysql_db:
+    name: "{{ mail['postfixadmin']['sql_db'] }}"
+    login_unix_socket: /run/mysqld/mysqld.sock
+    state: present
   become: true
 
+- name: Create PostfixAdmin SQL user
+  community.mysql.mysql_user:
+    name: "{{ mail['postfixadmin']['sql_user'] }}"
+    password: "{{ mail['postfixadmin']['sql_password'] }}"
+    login_host: "127.0.0.1"
+    priv: "{{ mail['postfixadmin']['sql_db'] }}.*:ALL"
+    login_unix_socket: /run/mysqld/mysqld.sock
+    column_case_sensitive: true
+    state: present
+  become: true
+
+# We store this as a file so we don't get the noise of a changed hash
+# (and also changed config file) whenever this runs. 
 - name: Stat PostfixAdmin hash
   ansible.builtin.stat: 
-    path: /state/mail/pfa_hash
+    path: /var/www/postfixadmin/_pwh.txt
   become: true
   register: pfa_hash_file
 
 - name: Generate PostfixAdmin setup password hash
   ansible.builtin.shell: >-
-    php -r 'echo password_hash("{{ mail["postfixadmin"]["setup_password"] }}", PASSWORD_DEFAULT);' > /state/mail/pfa_hash
+    php -r 'echo password_hash("{{ mail["postfixadmin"]["setup_password"] }}", PASSWORD_DEFAULT);' > /var/www/postfixadmin/_pwh.txt
   when: not pfa_hash_file.stat.exists
   become: true
 
 - name: Get the PostfixAdmin hash
   ansible.builtin.slurp: 
-    src: /state/mail/pfa_hash
+    src: /var/www/postfixadmin/_pwh.txt
   become: true
   register: pfa_hash_file_content
 
@@ -92,12 +108,6 @@
   become: true
   register: nginx_site
 
-- name: Stat nginx site symlink
-  ansible.builtin.stat: 
-    path: /etc/nginx/sites-enabled/{{ hostname }}-postfixadmin
-  become: true
-  register: nginx_site_stat
-
 - name: Create symlink for nginx site
   ansible.builtin.file:
     src: /etc/nginx/sites-available/{{ hostname }}-postfixadmin
@@ -107,7 +117,6 @@
     mode: "0744"
     state: link
   become: true
-  when: not nginx_site_stat.stat.exists
 
 - name: Verify nginx site file
   ansible.builtin.command: nginx -t

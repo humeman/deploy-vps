@@ -33,6 +33,7 @@
     - spamassassin 
     - spamc
     - spamass-milter
+    - python3-pymysql
   become: true
 
 - name: Create scripts

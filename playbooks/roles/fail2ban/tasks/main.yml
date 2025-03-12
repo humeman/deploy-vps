@@ -1,28 +1,6 @@
-- name: Add scripts/fail2ban folder
-  ansible.builtin.file:
-    path: /scripts/fail2ban
-    state: directory
-    mode: '0755'
-  become: true
-
-- name: Add state/fail2ban folder
-  ansible.builtin.file:
-    path: /state/fail2ban
-    state: directory
-    mode: '0755'
-  become: true
-
-- name: Add templated script install.sh
-  ansible.builtin.template:
-    src: ../files/install.sh
-    dest: /scripts/fail2ban/install.sh
-    owner: root
-    group: root
-    mode: '0700'
-  become: true
-
-- name: Execute templated script install.sh
-  ansible.builtin.command: /bin/bash /scripts/fail2ban/install.sh 
+- name: Install fail2ban deb
+  ansible.builtin.apt:
+    deb: "{{ fail2ban['download'] }}"
   become: true
 
 - name: Add templated config file /etc/fail2ban/jail.local
@@ -66,7 +44,6 @@
     fail2ban_conf.changed or
     filter_d_1_file.changed or
     filter_d_2_file.changed
-
 
 - name: Enable fail2ban systemd service
   ansible.builtin.systemd:

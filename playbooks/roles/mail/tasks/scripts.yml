@@ -12,15 +12,6 @@
     mode: '0755'
   become: true
 
-- name: Add templated script postfixadmin/mysql.sh
-  ansible.builtin.template:
-    src: ../files/postfixadmin/mysql.sh
-    dest: /scripts/mail/postfixadmin-mysql.sh
-    owner: root
-    group: root
-    mode: '0700'
-  become: true
-
 - name: Add templated script mail-reload.sh
   ansible.builtin.template:
     src: ../files/mail-reload.sh

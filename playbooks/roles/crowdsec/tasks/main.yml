@@ -9,11 +9,20 @@
   become: true
   when: not crowdsec_repo.stat.exists
 
+- name: Get the latest CrowdSec version regardless of priority
+  ansible.builtin.shell: "apt list -a crowdsec | sed -n '2p' | awk '{print $2}'"
+  become: true
+  check_mode: false
+  register: latest_version
+
 - name: Install CrowdSec and IPTables bouncer
   ansible.builtin.apt:
     update_cache: no
     pkg:
-    - crowdsec
+    # The Ubuntu security ESR repository pins a really old version
+    # of CrowdSec at a higher priority than the new CrowdSec repo
+    # versions. Adding this base version forces a newer one
+    - crowdsec={{ latest_version.stdout | trim  }}
     - crowdsec-firewall-bouncer-iptables
   become: true
   notify:
