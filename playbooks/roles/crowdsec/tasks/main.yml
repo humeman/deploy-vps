@@ -26,7 +26,7 @@
   failed_when: console_status.rc > 1
 
 - name: Enroll to CrowdSec console
-  ansible.builtin.shell: cscli console enroll -e context {{ crowdsec["console_key"] }} -n {{ hostname }}
+  ansible.builtin.shell: cscli console enroll {{ crowdsec["console_key"] }} -n {{ hostname }}
   become: true
   when: console_status.rc == 1
   notify:
@@ -55,3 +55,23 @@
   ansible.builtin.shell: cscli collections install crowdsecurity/postfix
   become: true
   when: flags["mail"] and postfix_status.rc == 1
+
+- name: Change CrowdSec server port (config)
+  ansible.builtin.lineinfile:
+    path: /etc/crowdsec/config.yaml
+    regexp: '^(\s*)listen_uri: ([a-zA-Z0-9\.-_]+):'
+    line: '\1listen_uri: \2:6061'
+    backrefs: true
+  become: true
+  notify:
+    - Restart CrowdSec
+
+- name: Change CrowdSec server port (local API)
+  ansible.builtin.lineinfile:
+    path: /etc/crowdsec/local_api_credentials.yaml
+    regexp: '^url: ([htps]+)://([a-zA-Z0-9\.-_]+):'
+    line: 'url: \1://\2:6061'
+    backrefs: true
+  become: true
+  notify:
+    - Restart CrowdSec
