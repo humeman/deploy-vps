@@ -5,13 +5,6 @@
     mode: '0755'
   become: true
 
-- name: Add state/mail folder
-  ansible.builtin.file:
-    path: /state/mail
-    state: directory
-    mode: '0755'
-  become: true
-
 - name: Add templated script mail-reload.sh
   ansible.builtin.template:
     src: ../files/mail-reload.sh
