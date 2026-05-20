@@ -1,28 +1,52 @@
-- name: Add state/docker folder
-  ansible.builtin.file:
-    path: /state/docker
-    state: directory
-    mode: '0755'
-  become: true
-
 - name: Add scripts/docker folder
   ansible.builtin.file:
     path: /scripts/docker
     state: directory
     mode: '0755'
   become: true
-  
-- name: Add templated script add-repository.sh
-  ansible.builtin.template:
-    src: ../files/add-repository.sh
-    dest: /scripts/docker/add-repository.sh
-    owner: root
-    group: root
-    mode: '0700'
+
+- name: Install apt dependencies
+  apt:
+    pkg: 
+      - ca-certificates
+      - curl
+    state: latest
+    update_cache: false
   become: true
 
-- name: Execute templated script add-repository.sh
-  ansible.builtin.command: /bin/bash /scripts/docker/add-repository.sh 
+- name: Make sure /etc/apt/keyrings is available
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+  become: true
+
+- name: Download Docker keyring
+  ansible.builtin.get_url:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    dest: /etc/apt/keyrings/docker.asc
+    mode: '0444'
+  become: true
+
+- name: Get system architecture
+  ansible.builtin.shell: 'dpkg --print-architecture'
+  register: dpkg_architecture
+  become: true
+  check_mode: false
+
+- name: Get version codename
+  ansible.builtin.shell: '. /etc/os-release && echo "$VERSION_CODENAME"'
+  register: version_codename
+  become: true
+  check_mode: false
+
+- name: Add Docker repository to apt sources
+  ansible.builtin.template:
+    src: ../files/docker.list
+    dest: /etc/apt/sources.list.d/docker.list
+    owner: root
+    group: root
+    mode: '0755'
   become: true
 
 - name: Install Docker

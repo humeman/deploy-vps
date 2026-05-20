@@ -1,0 +1,1 @@
+deb [arch={{ dpkg_architecture.stdout | trim }} signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu     {{ version_codename.stdout | trim }} stable

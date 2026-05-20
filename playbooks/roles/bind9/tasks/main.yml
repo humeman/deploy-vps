@@ -59,10 +59,10 @@
     named_conf_options_file.changed or
     restart_conf_file.changed
 
-- name: Enable named-resolvconf systemd service
-  ansible.builtin.systemd:
-    name: named-resolvconf.service
-    state: started
-    scope: system
-    enabled: true
-  become: true
+# - name: Enable named-resolvconf systemd service
+#   ansible.builtin.systemd:
+#     name: named-resolvconf.service
+#     state: started
+#     scope: system
+#     enabled: true
+#   become: true

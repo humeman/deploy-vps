@@ -8,6 +8,7 @@
     - name: Update apt cache
       ansible.builtin.apt:
         update_cache: yes
+      check_mode: false
       become: true
     - name: Add state folder
       ansible.builtin.file:

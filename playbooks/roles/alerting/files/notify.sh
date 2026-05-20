@@ -24,13 +24,11 @@ if [ -n "${2}" ]; then
     fi
 fi
 
-service_status=$(systemctl -l status $1 --no-pager | tail -n 50 | jq -Rsa . | cut -d '"' -f 2)
-
 read -rd '' json <<EOF
 {
     "topic": "{{ alerting["ntfy_topic"] }}",
     "title": "Service: $1",
-    "message": "Service \`$1\` has failed.\n\`\`\`$service_status\`\`\`",
+    "message": "Service \`$1\` has failed.",
     "tags": ["rotating_light"],
     "priority": 4,
     "markdown": true
