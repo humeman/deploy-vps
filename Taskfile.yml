@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 
 tasks:
   check:
@@ -24,3 +24,12 @@ tasks:
       - bash ci/scripts/task-verify.sh
       - defer: bash ci/scripts/clean.sh
       - bash ci/scripts/ansible-execute.sh $ENV
+
+  deploy-local:
+    env:
+      IS_CI: 0
+      REPO_PATH: "."
+      REPO_NAME: "deploy-vps"
+    cmds:
+      - defer: bash ci/scripts/clean.sh
+      - bash ci/scripts/ansible-execute-local.sh
