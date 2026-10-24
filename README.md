@@ -69,7 +69,10 @@ The vault is stored in YAML format with the following options:
 * `email_address`: Email used for Certbot, alerting, etc. E: `camden@csenneff.com`
 * `b2_account`, `b2_key`, `b2_bucket`: Backblaze B2 details, if enabled.
 * `extra_backups`: A list of extra folders to back up to Backblaze. Most feature flags will result in automatic backups of their important directories.
-* `discord_webhook_url`: A discord (or Slack) webhook URL for alerting.
+* `alerting`: Notifier details for alerting. A dict.
+    * `url`: Base URL of the notifier API. E: `https://notify.example.com`
+    * `key`: Sender key for the notifier.
+    * `local_email`: Address for logwatch emails.
 * `users`: Users to auto-deploy. A list.
     * `name`: User's username. E: `camden`
     * `groups`: A list of groups to add to. E: `["sudo"]`

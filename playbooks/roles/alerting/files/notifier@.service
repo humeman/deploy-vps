@@ -1,5 +1,5 @@
 [Unit]
-Description=Sends service alerts to a Discord webhook
+Description=Sends service failure alerts to the notifier API
 
 [Service]
 Type=oneshot

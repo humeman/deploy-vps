@@ -1,54 +1,40 @@
+#!/bin/bash
 # Params:
-#  service [delay] [count]
+#  service
 # service: systemd service to alert on
-# delay: 1 to delay for 5 minutes, 0 to run immediately
-# count: number of executions, timeout at 10
 
-readonly MAX_RETRIES=10
-readonly RETRY_DELAY=300
+readonly MAX_ATTEMPTS=5
+readonly RETRY_DELAY=30
 
 if [ $# -eq 0 ]; then
-    echo "Parameters: service [delay] [count]"
+    echo "Parameters: service"
     exit 1
 fi
 
-count=1
-if [ -n "${3}" ]; then
-    count=$3
-    echo "Attempt: $3"
-fi
+service="$1"
 
-if [ -n "${2}" ]; then
-    if [ ${2} -eq 1 ]; then
+service_status=$(systemctl -l status "$service" --no-pager | tail -n 50)
+
+json=$(jq -n \
+    --arg title "Service failed" \
+    --arg description "$(printf '%s\n\n%s' "$service" "$service_status")" \
+    '{level: "error", title: $title, description: $description}')
+
+for attempt in $(seq 1 ${MAX_ATTEMPTS}); do
+    if curl --fail --silent --show-error --max-time 30 \
+        -X POST "{{ alerting["url"] }}/v1/notify" \
+        -H "Authorization: Bearer {{ alerting["key"] }}" \
+        -H "Content-Type: application/json" \
+        -d "$json"; then
+        exit 0
+    fi
+
+    echo "ERROR: Failed to post alert (attempt ${attempt}/${MAX_ATTEMPTS})."
+
+    if [ "${attempt}" -lt ${MAX_ATTEMPTS} ]; then
         sleep ${RETRY_DELAY}
     fi
-fi
+done
 
-service_status=$(systemctl -l status $1 --no-pager | tail -n 50 | jq -Rsa . | cut -d '"' -f 2)
-
-read -rd '' json <<EOF
-{
-    "topic": "{{ alerting["ntfy_topic"] }}",
-    "title": "Service: $1",
-    "message": "Service \`$1\` has failed.\n\`\`\`$service_status\`\`\`",
-    "tags": ["rotating_light"],
-    "priority": 4,
-    "markdown": true
-}
-EOF
-
-curl ntfy.sh \
-    -d "$json"
-
-if [ $? -ne 0 ]; then
-    echo "ERROR: Failed to post to ntfy."
-
-    if [ ${count} -ge ${MAX_RETRIES} ]; then
-        echo "Process failed after ${count} retries. Exiting."
-        exit 1
-    fi
-
-    let "count=count+1"
-
-    . /scripts/notifier/notify.sh $1 1 ${count}
-fi
+echo "Alert failed after ${MAX_ATTEMPTS} attempts. Exiting."
+exit 1
