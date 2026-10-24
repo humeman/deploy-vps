@@ -4,6 +4,15 @@
     state: present
   become: true
 
+- name: Remove legacy MongoDB apt source and keyring (from old install.sh)
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /etc/apt/sources.list.d/mongodb-org-6.0.list
+    - /usr/share/keyrings/mongodb.gpg
+  become: true
+
 - name: Add MongoDB apt repository
   ansible.builtin.deb822_repository:
     name: mongodb-org-6.0
