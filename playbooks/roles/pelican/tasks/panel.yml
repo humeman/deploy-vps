@@ -1,0 +1,231 @@
+- name: Create Pelican webroot
+  ansible.builtin.file:
+    path: '/var/www/pelican'
+    state: directory
+    mode: '0755'
+  become: true
+
+- name: Download Pelican panel
+  ansible.builtin.get_url:
+    url: 'https://github.com/pelican-dev/panel/releases/latest/download/panel.tar.gz'
+    dest: '/var/www/pelican/panel.tar.gz'
+    mode: '0700'
+  become: true
+
+- name: Extract Pelican panel into /var/www/pelican
+  ansible.builtin.unarchive:
+    src: '/var/www/pelican/panel.tar.gz'
+    dest: '/var/www/pelican'
+    remote_src: true
+    mode: '0755'
+    creates: '/var/www/pelican/storage'
+  become: true
+
+- name: Change Pelican storage directory permissions
+  ansible.builtin.file:
+    path: '/var/www/pelican/storage'
+    recurse: true
+    mode: '0755'
+  become: true
+
+- name: Change Pelican cache directory permissions
+  ansible.builtin.file:
+    path: '/var/www/pelican/bootstrap/cache'
+    recurse: true
+    mode: '0755'
+  become: true
+
+- name: Create Pelican database
+  community.mysql.mysql_db:
+    name: "{{ pelican['sql']['db'] }}"
+    login_unix_socket: /run/mysqld/mysqld.sock
+    state: present
+  become: true
+
+- name: Create Pelican database user
+  community.mysql.mysql_user:
+    name: "{{ pelican['sql']['user'] }}"
+    password: "{{ pelican['sql']['password'] }}"
+    login_host: "127.0.0.1"
+    priv: "{{ pelican['sql']['db'] }}.*:ALL"
+    login_unix_socket: /run/mysqld/mysqld.sock
+    column_case_sensitive: true
+    state: present
+  become: true
+
+# .env is only copied from the example once -- its presence marks whether the
+# panel has already been configured, so it's used to gate the one-time setup
+# commands below instead of a hand-rolled state file.
+- name: Copy Pelican environment file
+  ansible.builtin.copy:
+    src: /var/www/pelican/.env.example
+    dest: /var/www/pelican/.env
+    remote_src: true
+    force: false
+    owner: root
+    group: root
+  become: true
+  register: pelican_env
+
+- name: Install Composer dependencies
+  ansible.builtin.command:
+    cmd: composer install --no-dev --optimize-autoloader
+    chdir: /var/www/pelican
+  environment:
+    COMPOSER_ALLOW_SUPERUSER: "1"
+  when: pelican_env.changed
+  become: true
+
+- name: Generate Pelican application key
+  ansible.builtin.command:
+    cmd: php artisan key:generate --force
+    chdir: /var/www/pelican
+  when: pelican_env.changed
+  become: true
+
+- name: Configure Pelican environment
+  ansible.builtin.command:
+    argv:
+      - php
+      - artisan
+      - p:environment:setup
+      - --no-interaction
+    chdir: /var/www/pelican
+  when: pelican_env.changed
+  become: true
+
+- name: Configure Pelican cache/session/queue drivers
+  ansible.builtin.command:
+    argv:
+      - php
+      - artisan
+      - p:environment:cache
+      - --driver=redis
+      - --redis-host=localhost
+      - --redis-pass=null
+      - --redis-port=6379
+      - --no-interaction
+    chdir: /var/www/pelican
+  when: pelican_env.changed
+  become: true
+
+- name: Configure Pelican database connection
+  ansible.builtin.command:
+    argv:
+      - php
+      - artisan
+      - p:environment:database
+      - --host=127.0.0.1
+      - --port=3306
+      - --database={{ pelican["sql"]["db"] }}
+      - --username={{ pelican["sql"]["user"] }}
+      - --password={{ pelican["sql"]["password"] }}
+      - --no-interaction
+    chdir: /var/www/pelican
+  when: pelican_env.changed
+  become: true
+
+- name: Run Pelican database migrations
+  ansible.builtin.command:
+    cmd: php artisan migrate --seed --force
+    chdir: /var/www/pelican
+  when: pelican_env.changed
+  become: true
+
+- name: Create Pelican admin user
+  ansible.builtin.command:
+    argv:
+      - php
+      - artisan
+      - p:user:make
+      - --email={{ pelican["user"]["email"] }}
+      - --username={{ pelican["user"]["username"] }}
+      - --password={{ pelican["user"]["password"] }}
+      - --admin=1
+      - --no-interaction
+    chdir: /var/www/pelican
+  when: pelican_env.changed
+  become: true
+
+- name: Set ownership of Pelican files
+  ansible.builtin.file:
+    path: /var/www/pelican
+    owner: www-data
+    group: www-data
+    recurse: true
+  become: true
+
+- name: Create Pelican queue worker cron job
+  ansible.builtin.cron:
+    name: "pelican queue"
+    job: "php /var/www/pelican/artisan schedule:run >> /dev/null 2>&1"
+
+- name: Create Pelican queue systemd service
+  ansible.builtin.template:
+    src: ../files/pelican-queue.service
+    dest: /etc/systemd/system/pelican-queue.service
+    owner: root
+    group: root
+  become: true
+  register: pelican_queue_systemd_conf
+
+- name: Validate Pelican queue systemd service
+  ansible.builtin.command: systemd-analyze verify /etc/systemd/system/pelican-queue.service
+  become: true
+  when: pelican_queue_systemd_conf.changed
+
+- name: Enable Pelican queue worker
+  ansible.builtin.systemd:
+    name: pelican-queue.service
+    state: started
+    scope: system
+    enabled: true
+  become: true
+
+- name: "Set up Let's Encrypt for panel"
+  include_tasks: "../../certbot/tasks/main.yml"
+  vars:
+    certbot_domain: "{{ pelican['panel_host'] }}"
+    certbot_email: "{{ email_address }}"
+    certbot_flags: ""
+
+- name: Create nginx site file
+  ansible.builtin.template:
+    src: ../files/nginx
+    dest: /etc/nginx/sites-available/{{ pelican['panel_host'] }}
+    owner: root
+    group: root
+    mode: "0744"
+  become: true
+  register: nginx_site
+
+- name: Stat nginx site symlink
+  ansible.builtin.stat:
+    path: /etc/nginx/sites-enabled/{{ pelican['panel_host'] }}
+  become: true
+  register: nginx_site_stat
+
+- name: Create symlink for nginx site
+  ansible.builtin.file:
+    src: /etc/nginx/sites-available/{{ pelican['panel_host'] }}
+    dest: /etc/nginx/sites-enabled/{{ pelican['panel_host'] }}
+    owner: root
+    group: root
+    mode: "0744"
+    state: link
+  become: true
+  when: not nginx_site_stat.stat.exists
+
+- name: Verify nginx site file
+  ansible.builtin.command: nginx -t
+  become: true
+  when: nginx_site.changed
+
+- name: Restart nginx
+  ansible.builtin.systemd:
+    name: nginx.service
+    state: restarted
+    scope: system
+    enabled: true
+  become: true
+  when: nginx_site.changed

@@ -1,9 +1,6 @@
 
-- name: Set up scripts
-  include_tasks: scripts.yml
-
 - name: Install dependencies
   include_tasks: dependencies.yml
 
-- name: Install Pterodactyl
+- name: Install Pelican
   include_tasks: panel.yml

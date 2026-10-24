@@ -63,10 +63,10 @@
       include_role:
         name: docker
       when: flags['docker'] and (only_deploy_list is not defined or 'docker' in only_deploy_list)
-    - name: Pterodactyl
+    - name: Pelican
       include_role:
-        name: pterodactyl
-      when: flags['docker'] and flags['pterodactyl'] and (only_deploy_list is not defined or 'pterodactyl' in only_deploy_list)
+        name: pelican
+      when: flags['docker'] and flags['pelican'] and (only_deploy_list is not defined or 'pelican' in only_deploy_list)
     - name: Wings
       include_role:
         name: wings

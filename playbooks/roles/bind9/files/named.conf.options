@@ -21,6 +21,9 @@ options {
         dnssec-validation auto;
 
         max-cache-size 10%;
-
-        listen-on-v6 { any; };
+        version "not currently available";
+        recursion yes;
+        allow-recursion { 127.0.0.1; 192.168.0.0/24; 10.10.10.0/24; };
+        listen-on { 127.0.0.1; };
+        listen-on-v6 { ::1; };
 };

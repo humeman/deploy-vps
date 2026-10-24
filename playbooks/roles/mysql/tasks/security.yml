@@ -1,21 +1,27 @@
-- name: Add scripts/mysql folder
-  ansible.builtin.file:
-    path: /scripts/mysql
-    state: directory
-    mode: '0755'
+# Native equivalent of mysql_secure_installation's key steps.
+- name: Remove anonymous MySQL users
+  community.mysql.mysql_user:
+    name: ''
+    host_all: true
+    state: absent
+    login_unix_socket: /run/mysqld/mysqld.sock
   become: true
 
-- name: Add templated script secure-setup.sh
-  ansible.builtin.template:
-    src: ../files/secure-setup.sh
-    dest: /scripts/mysql/secure-setup.sh
-    owner: root
-    group: root
-    mode: '0700'
+- name: Remove remote MySQL root accounts
+  community.mysql.mysql_user:
+    name: root
+    host: "{{ item }}"
+    state: absent
+    login_unix_socket: /run/mysqld/mysqld.sock
+  loop:
+    - "{{ ansible_hostname }}"
+    - "{{ ansible_fqdn }}"
+    - "%"
   become: true
-  register: mysql_script
 
-- name: Execute templated script secure-setup.sh
-  ansible.builtin.command: /bin/bash /scripts/mysql/secure-setup.sh 
+- name: Remove MySQL test database
+  community.mysql.mysql_db:
+    name: test
+    state: absent
+    login_unix_socket: /run/mysqld/mysqld.sock
   become: true
-  when: mysql_script.changed

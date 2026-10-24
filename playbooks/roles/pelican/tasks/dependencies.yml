@@ -1,4 +1,4 @@
-- name: Install Pterodactyl dependencies (1)
+- name: Install Pelican dependencies (1)
   ansible.builtin.apt:
     update_cache: no
     pkg:
@@ -9,12 +9,7 @@
     - gnupg
   become: true
 
-- name: Execute templated script add-repositories-1.sh
-  ansible.builtin.command: /bin/bash /scripts/pterodactyl/add-repositories-1.sh 
-  become: true
-  when: pterodactyl_add_repositories_1_script.changed
-
-- name: Install Pterodactyl dependencies (2)
+- name: Install Pelican dependencies (2)
   ansible.builtin.apt:
     update_cache: no
     pkg:
@@ -28,17 +23,14 @@
     - php{{ dependency_versions["php"] }}-xml
     - php{{ dependency_versions["php"] }}-fpm
     - php{{ dependency_versions["php"] }}-curl
-    - php{{ dependency_versions["php"] }}-zip 
-    - mariadb-server 
-    - tar 
+    - php{{ dependency_versions["php"] }}-zip
+    - php{{ dependency_versions["php"] }}-intl
+    - php{{ dependency_versions["php"] }}-sqlite3
+    - tar
     - nginx
-    - unzip 
-    - git 
+    - unzip
+    - git
     - redis-server
-  become: true
-
-- name: Execute templated script add-repositories-2.sh
-  ansible.builtin.command: /bin/bash /scripts/pterodactyl/add-repositories-2.sh 
   become: true
 
 - name: Enable Redis
@@ -47,4 +39,18 @@
     state: started
     scope: system
     enabled: true
+  become: true
+
+- name: Download Composer PHAR
+  ansible.builtin.get_url:
+    url: "https://getcomposer.org/download/latest-stable/composer.phar"
+    dest: /usr/local/bin/composer.phar
+    mode: "0755"
+  become: true
+
+- name: Create symlink for Composer
+  ansible.builtin.file:
+    src: /usr/local/bin/composer.phar
+    dest: /usr/local/bin/composer
+    state: link
   become: true

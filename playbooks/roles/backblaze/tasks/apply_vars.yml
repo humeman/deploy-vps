@@ -11,12 +11,12 @@
     flag_backups: "{{ flag_backups + ['/var/lib/mongodb'] }}"
   when: flags["mongodb"]
 
-- name: "Enable Pterodactyl Panel backups"
+- name: "Enable Pelican Panel backups"
   set_fact:
-    flag_backups: "{{ flag_backups + ['/var/www/pterodactyl'] }}"
-  when: flags["pterodactyl"]
+    flag_backups: "{{ flag_backups + ['/var/www/pelican'] }}"
+  when: flags["pelican"]
 
 - name: "Enable Wings backups"
   set_fact:
-    flag_backups: "{{ flag_backups + ['/etc/pterodactyl/config.yml', '/var/lib/pterodactyl/volumes', '/var/lib/pterodactyl/wings.db', '/var/lib/pterodactyl/states.json'] }}"
+    flag_backups: "{{ flag_backups + ['/etc/pelican/config.yml', '/var/lib/pelican/volumes', '/var/lib/pelican/wings.db', '/var/lib/pelican/states.json'] }}"
   when: flags["wings"]

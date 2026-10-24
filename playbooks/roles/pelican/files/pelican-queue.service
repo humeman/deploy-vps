@@ -1,8 +1,8 @@
-# Pterodactyl Queue Worker File
+# Pelican Queue Worker File
 # ----------------------------------
 
 [Unit]
-Description=Pterodactyl Queue Worker
+Description=Pelican Queue Worker
 After=redis-server.service
 OnFailure=notifier@%i.service
 
@@ -12,7 +12,7 @@ OnFailure=notifier@%i.service
 User=www-data
 Group=www-data
 Restart=always
-ExecStart=/usr/bin/php /var/www/pterodactyl/artisan queue:work --queue=high,standard,low --sleep=3 --tries=3
+ExecStart=/usr/bin/php /var/www/pelican/artisan queue:work --queue=high,standard,low --sleep=3 --tries=3
 StartLimitInterval=180
 StartLimitBurst=30
 RestartSec=5s

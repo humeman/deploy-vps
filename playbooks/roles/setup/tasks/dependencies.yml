@@ -7,4 +7,18 @@
     - git
     - python3
     - sl
+    - jq
   become: true
+
+- name: Add ondrej/php PPA
+  ansible.builtin.apt_repository:
+    repo: ppa:ondrej/php
+  become: true
+  register: php_ppa
+
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: yes
+  check_mode: false
+  become: true
+  when: php_ppa.changed

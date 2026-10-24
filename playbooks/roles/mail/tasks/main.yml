@@ -30,10 +30,18 @@
     - php{{ dependency_versions["php"] }}-gmp
     - php{{ dependency_versions["php"] }}-redis
     - acl
-    - spamassassin 
+    - python3-pymysql
+  become: true
+
+# spamass fails to start if the postfix user doesn't exist yet, which gets created
+# after postfix is installed
+- name: Install dependencies (2)
+  ansible.builtin.apt:
+    update_cache: no
+    pkg:
+    - spamassassin
     - spamc
     - spamass-milter
-    - python3-pymysql
   become: true
 
 - name: Create scripts

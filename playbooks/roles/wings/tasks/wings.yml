@@ -1,32 +1,29 @@
 - name: Create Wings config directory
   ansible.builtin.file:
-    path: '/etc/pterodactyl'
+    path: '/etc/pelican'
     state: directory
     mode: '0755'
   become: true
   register: wings_dir
 
-- name: Execute templated script install-wings.sh
-  ansible.builtin.command: /bin/bash /scripts/wings/install-wings.sh 
-  become: true
-
-- name: Update permissions for Wings binaries
-  ansible.builtin.file:
-    path: '/usr/local/bin/wings'
+- name: Download Wings binary
+  ansible.builtin.get_url:
+    url: "https://github.com/pelican-dev/wings/releases/latest/download/wings_linux_{{ 'amd64' if ansible_architecture == 'x86_64' else 'arm64' }}"
+    dest: '/usr/local/bin/wings'
     mode: '0755'
   become: true
 
 - name: "Set up Let's Encrypt for panel"
   include_tasks: "../../certbot/tasks/main.yml"
   vars:
-    certbot_domain: "{{ pterodactyl['wings_host'] }}"
+    certbot_domain: "{{ pelican['wings_host'] }}"
     certbot_email: "{{ email_address }}"
     certbot_flags: ""
 
 - name: Execute Wings configuration command
-  ansible.builtin.command: 
-    cmd: '{{ pterodactyl["wings_init_command"].split(" && ")[1] }}'
-    chdir: "/etc/pterodactyl"
+  ansible.builtin.command:
+    cmd: '{{ pelican["wings_init_command"].split(" && ")[1] }}'
+    chdir: "/etc/pelican"
   become: true
   when: wings_dir.changed
 
