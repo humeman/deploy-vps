@@ -66,9 +66,16 @@
   become: true
   when: mongod_conf.changed
 
+- name: Check whether MongoDB admin user was already created
+  ansible.builtin.stat:
+    path: /etc/mongod_admin_created
+  register: mongodb_admin_marker
+
 - name: Create MongoDB admin user
   community.mongodb.mongodb_user:
     login_host: localhost
+    login_user: "{{ 'admin' if mongodb_admin_marker.stat.exists else omit }}"
+    login_password: "{{ mongodb['admin_password'] if mongodb_admin_marker.stat.exists else omit }}"
     database: admin
     name: admin
     password: "{{ mongodb['admin_password'] }}"
